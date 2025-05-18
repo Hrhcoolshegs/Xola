@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  body {
+    @apply antialiased text-gray-800;
+  }
+}
+
+@layer components {
+  /* Mobile-first responsive table */
+  .responsive-table {
+    @apply w-full;
+  }
+  
+  @media (max-width: 768px) {
+    .responsive-table thead {
+      @apply hidden;
+    }
+    
+    .responsive-table tr {
+      @apply block border-b;
+    }
+    
+    .responsive-table td {
+      @apply block text-right pl-[50%] relative;
+    }
+    
+    .responsive-table td::before {
+      @apply content-[attr(data-label)] absolute left-0 w-[45%] pl-4 font-medium text-left text-gray-700;
+    }
+  }
+}
+
+/* Print styles */
+@media print {
+  @page {
+    margin: 2cm;
+  }
+  
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  .print\:hidden {
+    display: none !important;
+  }
+  
+  .print\:break-before-page {
+    break-before: page;
+  }
+  
+  .print\:break-after-page {
+    break-after: page;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  @apply w-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
