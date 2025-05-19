@@ -12,7 +12,7 @@ const Sidebar = () => {
     { name: t('nav.dashboard'), to: '/', icon: LayoutDashboard },
     { name: t('nav.patients'), to: '/patients', icon: Users },
     { name: t('nav.appointments'), to: '/appointments', icon: Calendar },
-    { name: t('nav.clinicalTreatment'), to: '/clinical-treatment', icon: Stethoscope },
+    { name: t('nav.clinical'), to: '/clinical', icon: Stethoscope },
     { name: t('nav.analytics'), to: '/analytics', icon: LineChart },
     { name: t('nav.medications'), to: '/medications', icon: PillIcon },
     { name: t('nav.reports'), to: '/reports', icon: FileText },

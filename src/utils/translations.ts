@@ -4,7 +4,7 @@ export const translations = {
     'nav.dashboard': 'Dashboard',
     'nav.patients': 'Patients',
     'nav.appointments': 'Appointments',
-    'nav.clinicalTreatment': 'Clinical & Treatment',
+    'nav.clinical': 'Clinical',
     'nav.analytics': 'Analytics',
     'nav.medications': 'Medications',
     'nav.reports': 'Reports',
@@ -67,9 +67,7 @@ export const translations = {
     'appointments.cancelled': 'Cancelled',
     'appointments.completed': 'Completed',
     
-    // Clinical & Treatment
-    'clinicalTreatment.title': 'Clinical & Treatment',
-    'clinicalTreatment.subtitle': 'Manage patient treatments and clinical records',
+    // Clinical
     'clinical.title': 'Clinical Suite',
     'clinical.diagnostics': 'Diagnostics',
     'clinical.step1': 'Image Upload & Analysis',
@@ -118,8 +116,6 @@ export const translations = {
     'common.status': 'Status',
     'common.noData': 'No data available',
     'common.noresults': 'No results found',
-    'common.showing': 'Showing',
-    'common.of': 'of',
     
     // Footer
     'footer.powered': 'Powered by Optimus AI',
@@ -133,7 +129,7 @@ export const translations = {
     'nav.dashboard': 'Tableau de bord',
     'nav.patients': 'Patients',
     'nav.appointments': 'Rendez-vous',
-    'nav.clinicalTreatment': 'Clinique & Traitement',
+    'nav.clinical': 'Clinique',
     'nav.analytics': 'Analytique',
     'nav.medications': 'Médicaments',
     'nav.reports': 'Rapports',
@@ -196,9 +192,7 @@ export const translations = {
     'appointments.cancelled': 'Annulé',
     'appointments.completed': 'Terminé',
     
-    // Clinical & Treatment
-    'clinicalTreatment.title': 'Clinique & Traitement',
-    'clinicalTreatment.subtitle': 'Gérer les traitements et dossiers cliniques des patients',
+    // Clinical
     'clinical.title': 'Suite clinique',
     'clinical.diagnostics': 'Diagnostics',
     'clinical.step1': 'Téléchargement et analyse d\'images',
@@ -247,8 +241,6 @@ export const translations = {
     'common.status': 'Statut',
     'common.noData': 'Aucune donnée disponible',
     'common.noresults': 'Aucun résultat trouvé',
-    'common.showing': 'Affichage de',
-    'common.of': 'sur',
     
     // Footer
     'footer.powered': 'Propulsé par Optimus AI',
