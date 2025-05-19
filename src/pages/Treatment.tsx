@@ -7,14 +7,52 @@ import { Badge } from '../components/ui/Badge';
 import { Plus, Calendar, DollarSign, Clock, CheckCircle, AlertCircle, ChevronRight, FileText, Pill } from 'lucide-react';
 import { clinicalData } from '../utils/sampleData';
 import { TreatmentVisualizer } from '../components/treatment/TreatmentVisualizer';
+import { TreatmentTimeline } from '../components/treatment/TreatmentTimeline';
+import { ImageGallery } from '../components/treatment/ImageGallery';
+import { DatePickerModal } from '../components/treatment/DatePickerModal';
 
 const Treatment = () => {
   const { t } = useLanguage();
   const location = useLocation();
   const [filter, setFilter] = useState('active');
   const [selectedProcedure, setSelectedProcedure] = useState<string | null>(null);
+  const [showGallery, setShowGallery] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const { diagnosticData, patientId, recommendations } = location.state || {};
+
+  // Mock timeline data
+  const timelineSteps = [
+    {
+      id: '1',
+      date: '2023-09-15',
+      title: 'Initial Consultation',
+      description: 'Complete examination and treatment planning',
+      status: 'completed' as const,
+      images: {
+        before: 'https://images.pexels.com/photos/3845126/pexels-photo-3845126.jpeg?auto=compress&cs=tinysrgb&w=600',
+        after: 'https://images.pexels.com/photos/3845548/pexels-photo-3845548.jpeg?auto=compress&cs=tinysrgb&w=600'
+      }
+    },
+    {
+      id: '2',
+      date: '2023-09-22',
+      title: 'First Treatment Session',
+      description: 'Deep cleaning and initial procedure',
+      status: 'current' as const,
+      images: {
+        before: 'https://images.pexels.com/photos/3845126/pexels-photo-3845126.jpeg?auto=compress&cs=tinysrgb&w=600'
+      }
+    },
+    {
+      id: '3',
+      date: '2023-10-06',
+      title: 'Follow-up Treatment',
+      description: 'Review progress and continue treatment',
+      status: 'upcoming' as const
+    }
+  ];
 
   // Get treatment data from the sample data
   const treatments = clinicalData.treatments;
@@ -38,6 +76,16 @@ const Treatment = () => {
 
   const handleProcedureClick = (procedureName: string) => {
     setSelectedProcedure(selectedProcedure === procedureName ? null : procedureName);
+  };
+
+  const handleImageClick = (imageUrl: string) => {
+    setSelectedImage(imageUrl);
+    setShowGallery(true);
+  };
+
+  const handleScheduleAppointment = (date: Date, time: string) => {
+    console.log('Scheduling appointment for:', date, time);
+    // Implement appointment scheduling logic here
   };
 
   return (
@@ -91,6 +139,11 @@ const Treatment = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TreatmentTimeline 
+          steps={timelineSteps}
+          onImageClick={handleImageClick}
+        />
+
         {activeTreatments.map((treatment) => {
           const totalCost = treatment.procedures.reduce((sum, proc) => sum + proc.cost, 0);
           const completedProcedures = treatment.procedures.filter(proc => proc.status === 'completed').length;
@@ -222,10 +275,10 @@ const Treatment = () => {
                   <Button
                     variant="primary"
                     size="sm"
-                    icon={<ChevronRight size={16} />}
-                    iconPosition="right"
+                    icon={<Calendar size={16} />}
+                    onClick={() => setShowDatePicker(true)}
                   >
-                    Continue Treatment
+                    Schedule Next Visit
                   </Button>
                 </div>
               </div>
@@ -241,6 +294,23 @@ const Treatment = () => {
           <p className="text-gray-500">Switch to "Active" to view current treatment plans</p>
         </div>
       )}
+
+      {showGallery && selectedImage && (
+        <ImageGallery
+          images={[selectedImage]}
+          onClose={() => {
+            setShowGallery(false);
+            setSelectedImage(null);
+          }}
+        />
+      )}
+
+      <DatePickerModal
+        isOpen={showDatePicker}
+        onClose={() => setShowDatePicker(false)}
+        onConfirm={handleScheduleAppointment}
+        title="Schedule Next Appointment"
+      />
     </div>
   );
 };
