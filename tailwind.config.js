@@ -44,6 +44,19 @@ export default {
           900: '#331e00',
         },
       },
+      animation: {
+        'spin-slow': 'spin 3s linear infinite',
+        'bounce-slow': 'bounce 3s infinite',
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      },
+      transitionProperty: {
+        'height': 'height',
+        'spacing': 'margin, padding',
+      },
+      screens: {
+        'xs': '475px',
+        '3xl': '1920px',
+      },
     },
   },
   plugins: [],
