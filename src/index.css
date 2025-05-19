@@ -10,6 +10,10 @@
   body {
     @apply antialiased text-gray-800;
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-primary-900;
+  }
 }
 
 @layer components {
@@ -33,6 +37,42 @@
     .responsive-table td::before {
       @apply content-[attr(data-label)] absolute left-0 w-[45%] pl-4 font-medium text-left text-gray-700;
     }
+  }
+
+  .btn-primary {
+    @apply bg-gradient-primary text-white hover:shadow-lg transition-all duration-300;
+  }
+
+  .btn-accent {
+    @apply bg-gradient-accent text-white hover:shadow-lg transition-all duration-300;
+  }
+
+  .btn-tertiary {
+    @apply bg-gradient-tertiary text-white hover:shadow-lg transition-all duration-300;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300;
+  }
+
+  .input-field {
+    @apply border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300;
+  }
+
+  .badge {
+    @apply px-2 py-1 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply bg-primary-100 text-primary-800;
+  }
+
+  .badge-accent {
+    @apply bg-accent-100 text-accent-800;
+  }
+
+  .badge-tertiary {
+    @apply bg-tertiary-100 text-tertiary-800;
   }
 }
 
@@ -70,46 +110,40 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 rounded-full;
+  @apply bg-primary-300 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400;
+  @apply bg-primary-400;
 }
 
 /* Treatment Visualizer Animation */
 @keyframes progress {
-  0% {
-    width: 0%;
-  }
-  50% {
-    width: 100%;
-  }
-  100% {
-    width: 0%;
-  }
+  0% { width: 0%; }
+  50% { width: 100%; }
+  100% { width: 0%; }
 }
 
 /* Consistent Form Styles */
 .form-input {
-  @apply w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent transition-colors;
+  @apply w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300;
 }
 
 .form-select {
-  @apply w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent transition-colors appearance-none bg-white;
+  @apply w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 appearance-none bg-white;
 }
 
 .form-checkbox {
-  @apply h-4 w-4 text-[#0073b9] border-gray-300 rounded focus:ring-[#0073b9] transition-colors;
+  @apply h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary transition-all duration-300;
 }
 
 .form-radio {
-  @apply h-4 w-4 text-[#0073b9] border-gray-300 focus:ring-[#0073b9] transition-colors;
+  @apply h-4 w-4 text-primary border-gray-300 focus:ring-primary transition-all duration-300;
 }
 
 /* Card Hover Effects */
 .hover-card {
-  @apply transition-all duration-200 hover:shadow-md hover:border-[#0073b9]/20;
+  @apply transition-all duration-300 hover:shadow-lg hover:border-primary/20;
 }
 
 /* Button Loading State */
@@ -129,12 +163,8 @@
 }
 
 @keyframes button-loading-spinner {
-  from {
-    transform: rotate(0turn);
-  }
-  to {
-    transform: rotate(1turn);
-  }
+  from { transform: rotate(0turn); }
+  to { transform: rotate(1turn); }
 }
 
 /* Toast Animations */
@@ -175,7 +205,7 @@
 
 /* Focus Styles */
 .focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:ring-offset-2 focus:ring-offset-white;
+  @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-white;
 }
 
 /* Skeleton Loading */
@@ -193,7 +223,7 @@
 
 /* Tooltip */
 .tooltip {
-  @apply invisible absolute z-10 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg opacity-0 shadow-sm transition-opacity duration-300;
+  @apply invisible absolute z-10 px-3 py-2 text-sm font-medium text-white bg-primary rounded-lg opacity-0 shadow-sm transition-all duration-300;
 }
 
 .has-tooltip:hover .tooltip {
@@ -216,25 +246,25 @@
 }
 
 .status-dot.active::before {
-  @apply bg-green-400;
+  @apply bg-semantic-success;
 }
 
 .status-dot.active::after {
-  @apply bg-green-500;
+  @apply bg-semantic-success;
 }
 
 .status-dot.warning::before {
-  @apply bg-yellow-400;
+  @apply bg-semantic-warning;
 }
 
 .status-dot.warning::after {
-  @apply bg-yellow-500;
+  @apply bg-semantic-warning;
 }
 
 .status-dot.error::before {
-  @apply bg-red-400;
+  @apply bg-semantic-error;
 }
 
 .status-dot.error::after {
-  @apply bg-red-500;
+  @apply bg-semantic-error;
 }
