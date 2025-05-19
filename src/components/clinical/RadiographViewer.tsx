@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
-import { AlertTriangle, Eye, FileText, Plus, ChevronRight, Tooth, Calendar } from 'lucide-react';
+import { AlertTriangle, Eye, FileText, Plus, ChevronRight, Bluetooth as Tooth, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Finding {
