@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { Upload, Image, User, FileText, Check, ArrowRight, ArrowLeft, AlertCircle, Trash2, Loader, Pill } from 'lucide-react';
+import { Upload, Image, User, FileText, Check, ArrowRight, ArrowLeft, AlertCircle, Trash2, Loader, Pill, Clipboard } from 'lucide-react';
 import { patients, clinicalData } from '../utils/sampleData';
 
 const Clinical = () => {
@@ -18,14 +18,12 @@ const Clinical = () => {
   const [analysisResults, setAnalysisResults] = useState<any>(null);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
-  // Handle file upload and generate previews
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       const fileArray = Array.from(files);
       setUploadedFiles(fileArray);
       
-      // Generate preview URLs
       const urls = fileArray.map(file => URL.createObjectURL(file));
       setPreviewUrls(urls);
       
@@ -33,7 +31,6 @@ const Clinical = () => {
     }
   };
 
-  // Handle drag and drop
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const files = e.dataTransfer.files;
@@ -41,7 +38,6 @@ const Clinical = () => {
       const fileArray = Array.from(files);
       setUploadedFiles(fileArray);
       
-      // Generate preview URLs
       const urls = fileArray.map(file => URL.createObjectURL(file));
       setPreviewUrls(urls);
       
@@ -49,7 +45,6 @@ const Clinical = () => {
     }
   };
 
-  // Cleanup preview URLs when component unmounts or files change
   const cleanupPreviews = () => {
     previewUrls.forEach(url => URL.revokeObjectURL(url));
   };
@@ -58,7 +53,6 @@ const Clinical = () => {
     e.preventDefault();
   };
 
-  // Simulate upload progress
   const simulateUploadProgress = () => {
     setUploadProgress(0);
     const interval = setInterval(() => {
@@ -72,24 +66,20 @@ const Clinical = () => {
     }, 200);
   };
 
-  // Remove a file from the upload list
   const removeFile = (index: number) => {
     URL.revokeObjectURL(previewUrls[index]);
     setPreviewUrls(prev => prev.filter((_, i) => i !== index));
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Go to next step
   const nextStep = () => {
     if (step === 1 && uploadedFiles.length > 0) {
       setStep(2);
     } else if (step === 2 && selectedPatient) {
       setStep(3);
-      // Simulate AI processing
       setIsProcessing(true);
       setTimeout(() => {
         setIsProcessing(false);
-        // Get random diagnostic data for demo
         const randomDiagnostic = clinicalData.diagnostics[
           Math.floor(Math.random() * clinicalData.diagnostics.length)
         ];
@@ -98,7 +88,6 @@ const Clinical = () => {
     }
   };
 
-  // Go to previous step
   const prevStep = () => {
     if (step === 2) {
       setStep(1);
@@ -109,13 +98,24 @@ const Clinical = () => {
     }
   };
 
-  // Handle generating full report
   const handleGenerateReport = () => {
     const patientData = patients.find(p => p.id === selectedPatient);
     navigate('/report', { 
       state: { 
         diagnosticData: analysisResults,
         patientData
+      }
+    });
+  };
+
+  const handleInitiateTreatment = () => {
+    if (!analysisResults || !selectedPatient) return;
+    
+    navigate('/treatment/new', {
+      state: {
+        diagnosticData: analysisResults,
+        patientId: selectedPatient,
+        recommendations: analysisResults.recommendations
       }
     });
   };
@@ -616,13 +616,22 @@ const Clinical = () => {
                     >
                       {t('common.previous')}
                     </Button>
-                    <Button 
-                      variant="primary" 
-                      icon={<FileText size={16} />}
-                      onClick={handleGenerateReport}
-                    >
-                      Generate Full Report
-                    </Button>
+                    <div className="space-x-3">
+                      <Button 
+                        variant="outline"
+                        icon={<FileText size={16} />}
+                        onClick={handleGenerateReport}
+                      >
+                        Generate Report
+                      </Button>
+                      <Button 
+                        variant="primary"
+                        icon={<Clipboard size={16} />}
+                        onClick={handleInitiateTreatment}
+                      >
+                        Initiate Treatment Plan
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -643,7 +652,6 @@ const Clinical = () => {
   );
 };
 
-// For the Search component used in step 2
 const Search = (props: any) => {
   return (
     <svg
