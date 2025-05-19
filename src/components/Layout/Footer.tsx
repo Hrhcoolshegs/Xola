@@ -10,7 +10,14 @@ const Footer = () => {
           <span>{t('footer.copyright')}</span>
         </div>
         <div>
-          <span className="text-[#0073b9]">{t('footer.powered')}</span>
+          <a 
+            href="https://optimusai.ai/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-[#0073b9] hover:underline"
+          >
+            {t('footer.powered')}
+          </a>
         </div>
       </div>
     </footer>
