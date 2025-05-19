@@ -1,3 +1,5 @@
+import { clinicalData } from '../utils/sampleData';
+
 interface AIRecommendation {
   confidence: number;
   suggestion: string;
