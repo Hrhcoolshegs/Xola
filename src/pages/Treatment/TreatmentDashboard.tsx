@@ -6,6 +6,31 @@ import { Badge } from '../../components/ui/Badge';
 import { Plus, Activity, Calendar, DollarSign } from 'lucide-react';
 import { useTreatmentStore } from '../../store/treatmentStore';
 import { treatmentService } from '../../services/treatmentService';
+import { TreatmentVisualizer } from '../../components/Treatment/TreatmentVisualizer';
+
+const sampleSteps = [
+  {
+    id: '1',
+    title: 'Initial Examination',
+    description: 'Comprehensive dental examination and X-rays',
+    imageUrl: 'https://images.pexels.com/photos/3845126/pexels-photo-3845126.jpeg?auto=compress&cs=tinysrgb&w=600',
+    duration: '30 mins'
+  },
+  {
+    id: '2',
+    title: 'Cleaning & Preparation',
+    description: 'Professional cleaning and cavity preparation',
+    imageUrl: 'https://images.pexels.com/photos/3845548/pexels-photo-3845548.jpeg?auto=compress&cs=tinysrgb&w=600',
+    duration: '45 mins'
+  },
+  {
+    id: '3',
+    title: 'Filling Placement',
+    description: 'Composite filling placement and curing',
+    imageUrl: 'https://images.pexels.com/photos/3845729/pexels-photo-3845729.jpeg?auto=compress&cs=tinysrgb&w=600',
+    duration: '1 hour'
+  }
+];
 
 const TreatmentDashboard = () => {
   const { isLoading, setLoading, setError } = useTreatmentStore();
@@ -90,42 +115,46 @@ const TreatmentDashboard = () => {
         </Card>
       </div>
 
-      <Card title="Recent Treatment Plans">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-              <tr>
-                <th className="px-4 py-3">Patient</th>
-                <th className="px-4 py-3">Plan Type</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Progress</th>
-                <th className="px-4 py-3">Next Step</th>
-                <th className="px-4 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-b hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium">Emma Thompson</td>
-                <td className="px-4 py-3">Full Restoration</td>
-                <td className="px-4 py-3">
-                  <Badge variant="success">Active</Badge>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-primary h-2 rounded-full" style={{ width: '60%' }}></div>
-                  </div>
-                </td>
-                <td className="px-4 py-3">Crown Fitting</td>
-                <td className="px-4 py-3">
-                  <Link to="/treatment/1" className="text-primary hover:underline">
-                    View Details
-                  </Link>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TreatmentVisualizer steps={sampleSteps} />
+
+        <Card title="Recent Treatment Plans">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3">Patient</th>
+                  <th className="px-4 py-3">Plan Type</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Progress</th>
+                  <th className="px-4 py-3">Next Step</th>
+                  <th className="px-4 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b hover:bg-gray-50">
+                  <td className="px-4 py-3 font-medium">Emma Thompson</td>
+                  <td className="px-4 py-3">Full Restoration</td>
+                  <td className="px-4 py-3">
+                    <Badge variant="success">Active</Badge>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-primary h-2 rounded-full" style={{ width: '60%' }}></div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">Crown Fitting</td>
+                  <td className="px-4 py-3">
+                    <Link to="/treatment/1" className="text-primary hover:underline">
+                      View Details
+                    </Link>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 };
