@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { Upload, Image as ImageIcon, User, FileText, Check, ArrowRight, ArrowLeft, AlertCircle, Trash2, Loader, Pill, Clipboard } from 'lucide-react';
+import { ArrowLeft, ArrowRight, AlertCircle, Trash2, Loader, Pill, Clipboard } from 'lucide-react';
 import { patients, clinicalData } from '../utils/sampleData';
 import { ImageUploader } from '../components/clinical/ImageUploader';
 
@@ -393,7 +393,7 @@ const Clinical = () => {
                               {uploadedFiles.map((file, index) => (
                                 <div key={index} className="border rounded-lg p-1">
                                   <div className="aspect-square flex items-center justify-center bg-gray-50">
-                                    <ImageIcon size={20} className="text-gray-400" />
+                                    <Image size={20} className="text-gray-400" />
                                   </div>
                                 </div>
                               ))}
