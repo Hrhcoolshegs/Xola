@@ -118,6 +118,8 @@ export const translations = {
     'common.status': 'Status',
     'common.noData': 'No data available',
     'common.noresults': 'No results found',
+    'common.showing': 'Showing',
+    'common.of': 'of',
     
     // Footer
     'footer.powered': 'Powered by Optimus AI',
@@ -245,6 +247,8 @@ export const translations = {
     'common.status': 'Statut',
     'common.noData': 'Aucune donnée disponible',
     'common.noresults': 'Aucun résultat trouvé',
+    'common.showing': 'Affichage de',
+    'common.of': 'sur',
     
     // Footer
     'footer.powered': 'Propulsé par Optimus AI',
