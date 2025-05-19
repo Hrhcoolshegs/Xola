@@ -8,6 +8,7 @@ import Appointments from './pages/Appointments';
 import Clinical from './pages/Clinical';
 import Analytics from './pages/Analytics';
 import Report from './pages/Report';
+import TreatmentList from './pages/Treatment/TreatmentList';
 import ComingSoon from './pages/ComingSoon';
 import NotFound from './pages/NotFound';
 
@@ -22,6 +23,7 @@ function App() {
             <Route path="patients/:id" element={<PatientDetail />} />
             <Route path="appointments" element={<Appointments />} />
             <Route path="clinical" element={<Clinical />} />
+            <Route path="treatment" element={<TreatmentList />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="report" element={<Report />} />
             <Route path="medications" element={<ComingSoon title="Medications" />} />
