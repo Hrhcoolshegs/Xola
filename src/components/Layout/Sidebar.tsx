@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
-import { LayoutDashboard, Users, Calendar, Stethoscope, LineChart, PillIcon, FileText, Settings, HelpCircle, ChevronLeft, ChevronRight, Syringe } from 'lucide-react';
+import { LayoutDashboard, Users, Calendar, Stethoscope, LineChart, PillIcon, FileText, Settings, HelpCircle, ChevronLeft, ChevronRight, Syringe, Clipboard } from 'lucide-react';
 
 const Sidebar = () => {
   const { t } = useLanguage();
@@ -13,6 +13,7 @@ const Sidebar = () => {
     { name: t('nav.patients'), to: '/patients', icon: Users },
     { name: t('nav.appointments'), to: '/appointments', icon: Calendar },
     { name: t('nav.clinical'), to: '/clinical', icon: Stethoscope },
+    { name: t('nav.treatment'), to: '/treatment', icon: Clipboard },
     { name: t('nav.analytics'), to: '/analytics', icon: LineChart },
     { name: t('nav.medications'), to: '/medications', icon: PillIcon },
     { name: t('nav.reports'), to: '/reports', icon: FileText },
