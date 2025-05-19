@@ -193,7 +193,7 @@
 
 /* Tooltip */
 .tooltip {
-  @apply invisible absolute z-10 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg opacity-0 tooltip shadow-sm transition-opacity duration-300;
+  @apply invisible absolute z-10 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg opacity-0 shadow-sm transition-opacity duration-300;
 }
 
 .has-tooltip:hover .tooltip {
