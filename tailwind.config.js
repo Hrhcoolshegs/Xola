@@ -44,6 +44,9 @@ export default {
           900: '#331e00',
         },
       },
+      backgroundImage: {
+        'gradient-primary': 'linear-gradient(to right, #0a2540, #16a085)',
+      },
     },
   },
   plugins: [],
