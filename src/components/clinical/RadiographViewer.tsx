@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
-import { AlertTriangle, Eye, FileText, Plus } from 'lucide-react';
+import { AlertTriangle, Eye, FileText, Plus, ChevronRight, Tooth, Calendar } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Finding {
   id: string;
@@ -11,23 +12,38 @@ interface Finding {
   severity: 'low' | 'medium' | 'high';
   description: string;
   recommendations: string[];
+  toothNumbers?: string[];
 }
 
 interface RadiographViewerProps {
   imageUrl: string;
   findings: Finding[];
   onAddTreatment?: (finding: Finding) => void;
+  onAddToChart?: (finding: Finding) => void;
+  onScheduleAppointment?: (finding: Finding) => void;
 }
 
-export const RadiographViewer = ({ imageUrl, findings, onAddTreatment }: RadiographViewerProps) => {
+export const RadiographViewer = ({ 
+  imageUrl, 
+  findings, 
+  onAddTreatment,
+  onAddToChart,
+  onScheduleAppointment
+}: RadiographViewerProps) => {
   const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [showQuickActions, setShowQuickActions] = useState(false);
 
   useEffect(() => {
     const img = new Image();
     img.src = imageUrl;
     img.onload = () => setImageLoaded(true);
   }, [imageUrl]);
+
+  const handleFindingClick = (finding: Finding) => {
+    setSelectedFinding(finding === selectedFinding ? null : finding);
+    setShowQuickActions(finding !== selectedFinding);
+  };
 
   return (
     <Card>
@@ -69,7 +85,7 @@ export const RadiographViewer = ({ imageUrl, findings, onAddTreatment }: Radiogr
                 top: '50%',
                 transform: 'translate(-50%, -50%)'
               }}
-              onClick={() => setSelectedFinding(finding)}
+              onClick={() => handleFindingClick(finding)}
             >
               <span className="text-xs font-medium">
                 {index + 1}
@@ -88,12 +104,17 @@ export const RadiographViewer = ({ imageUrl, findings, onAddTreatment }: Radiogr
                   ? 'border-[#0073b9] bg-blue-50'
                   : 'border-gray-200 hover:border-gray-300'
               }`}
-              onClick={() => setSelectedFinding(finding)}
+              onClick={() => handleFindingClick(finding)}
             >
               <div className="flex justify-between items-start">
                 <div>
                   <h5 className="font-medium text-gray-800">{finding.type}</h5>
                   <p className="text-sm text-gray-500">Area: {finding.area}</p>
+                  {finding.toothNumbers && (
+                    <p className="text-sm text-gray-500">
+                      Teeth: {finding.toothNumbers.join(', ')}
+                    </p>
+                  )}
                 </div>
                 <Badge
                   variant={
@@ -117,7 +138,7 @@ export const RadiographViewer = ({ imageUrl, findings, onAddTreatment }: Radiogr
                   <ul className="space-y-1">
                     {finding.recommendations.map((rec, index) => (
                       <li key={index} className="text-sm text-gray-600 flex items-center">
-                        <span className="w-1 h-1 bg-gray-400 rounded-full mr-2"></span>
+                        <ChevronRight size={14} className="mr-1 text-[#0073b9]" />
                         {rec}
                       </li>
                     ))}
@@ -125,23 +146,50 @@ export const RadiographViewer = ({ imageUrl, findings, onAddTreatment }: Radiogr
                 </div>
               )}
 
-              <div className="mt-4 flex justify-end space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  icon={<FileText size={16} />}
-                >
-                  Details
-                </Button>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  icon={<Plus size={16} />}
-                  onClick={() => onAddTreatment?.(finding)}
-                >
-                  Add to Treatment
-                </Button>
-              </div>
+              <AnimatePresence>
+                {selectedFinding?.id === finding.id && showQuickActions && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-4 flex justify-end space-x-2"
+                  >
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      icon={<Tooth size={16} />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onAddToChart?.(finding);
+                      }}
+                    >
+                      Add to Chart
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      icon={<Calendar size={16} />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onScheduleAppointment?.(finding);
+                      }}
+                    >
+                      Schedule
+                    </Button>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      icon={<Plus size={16} />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onAddTreatment?.(finding);
+                      }}
+                    >
+                      Add to Treatment
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           ))}
         </div>
