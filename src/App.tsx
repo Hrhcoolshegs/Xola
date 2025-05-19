@@ -10,6 +10,7 @@ import Analytics from './pages/Analytics';
 import Report from './pages/Report';
 import TreatmentDashboard from './pages/Treatment/TreatmentDashboard';
 import TreatmentList from './pages/Treatment/TreatmentList';
+import TreatmentReports from './pages/Treatment/TreatmentReports';
 import ComingSoon from './pages/ComingSoon';
 import NotFound from './pages/NotFound';
 
@@ -25,7 +26,7 @@ function App() {
             <Route path="appointments" element={<Appointments />} />
             <Route path="clinical" element={<Clinical />} />
             <Route path="treatment" element={<TreatmentDashboard />} />
-            <Route path="treatment/list" element={<TreatmentList />} />
+            <Route path="treatment/reports" element={<TreatmentReports />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="report" element={<Report />} />
             <Route path="medications" element={<ComingSoon title="Medications" />} />

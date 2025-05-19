@@ -15,7 +15,7 @@ import {
   ChevronRight, 
   Syringe,
   ClipboardList,
-  Clipboard
+  ListTodo
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -28,8 +28,7 @@ const Sidebar = () => {
     { name: t('nav.patients'), to: '/patients', icon: Users },
     { name: t('nav.appointments'), to: '/appointments', icon: Calendar },
     { name: t('nav.clinical'), to: '/clinical', icon: Stethoscope },
-    { name: 'Treatment Plans', to: '/treatment', icon: Clipboard },
-    { name: t('nav.treatment'), to: '/treatment/list', icon: ClipboardList },
+    { name: t('nav.treatment'), to: '/treatment', icon: ListTodo },
     { name: t('nav.analytics'), to: '/analytics', icon: LineChart },
     { name: t('nav.medications'), to: '/medications', icon: PillIcon },
     { name: t('nav.reports'), to: '/reports', icon: FileText },
