@@ -6,6 +6,7 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Upload, Image, User, FileText, Check, ArrowRight, ArrowLeft, AlertCircle, Trash2, Loader, Pill } from 'lucide-react';
 import { patients, clinicalData } from '../utils/sampleData';
+import { ToothDiagram } from '../components/ui/ToothDiagram';
 
 const Clinical = () => {
   const { t } = useLanguage();
@@ -17,6 +18,11 @@ const Clinical = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [analysisResults, setAnalysisResults] = useState<any>(null);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+
+  const handleToothConditionChange = (toothNumber: number, condition: any) => {
+    // In a real implementation, this would update the patient's dental record
+    console.log(`Tooth ${toothNumber} condition updated:`, condition);
+  };
 
   // Handle file upload and generate previews
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -168,6 +174,10 @@ const Clinical = () => {
         <div className="p-6">
           {step === 1 && (
             <div className="flex flex-col items-center">
+              <Card title="Dental Chart">
+                <ToothDiagram onConditionChange={handleToothConditionChange} />
+              </Card>
+              
               <div 
                 className="border-2 border-dashed border-gray-300 rounded-lg p-8 mb-6 w-full max-w-2xl text-center cursor-pointer hover:border-[#0073b9] transition-colors"
                 onDrop={handleDrop}
@@ -658,7 +668,7 @@ const Search = (props: any) => {
       strokeLinejoin="round"
       {...props}
     >
-      <circle cx="11" cy="11" r="8" />
+      <circle cx="11" cy="11" r="8"  />
       <path d="m21 21-4.3-4.3" />
     </svg>
   );
