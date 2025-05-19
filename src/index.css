@@ -13,7 +13,6 @@
 }
 
 @layer components {
-  /* Mobile-first responsive table */
   .responsive-table {
     @apply w-full;
   }
