@@ -1,12 +1,28 @@
-import { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
-import { LayoutDashboard, Users, Calendar, Stethoscope, LineChart, PillIcon, FileText, Settings, HelpCircle, ChevronLeft, ChevronRight, Syringe, Clipboard } from 'lucide-react';
+import { motion } from 'framer-motion';
+import {
+  LayoutDashboard,
+  Users,
+  Calendar,
+  Stethoscope,
+  LineChart,
+  PillIcon,
+  FileText,
+  Settings,
+  HelpCircle,
+  ChevronLeft,
+  ChevronRight,
+  Syringe,
+  Clipboard
+} from 'lucide-react';
 
 const Sidebar = () => {
   const { t } = useLanguage();
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const navigationItems = [
     { name: t('nav.dashboard'), to: '/', icon: LayoutDashboard, color: '#1e90ff' },
@@ -21,11 +37,28 @@ const Sidebar = () => {
     { name: t('nav.support'), to: '/support', icon: HelpCircle, color: '#0ea5e9' },
   ];
 
+  // Handle cross-module linking
+  const getContextualUrl = (baseUrl: string) => {
+    const params = new URLSearchParams(location.search);
+    const patientId = params.get('patientId');
+    const planId = params.get('planId');
+
+    if (patientId && baseUrl === '/patients') {
+      return `${baseUrl}/${patientId}`;
+    }
+    if (planId && baseUrl === '/treatment') {
+      return `${baseUrl}/${planId}`;
+    }
+    return baseUrl;
+  };
+
   return (
-    <div 
-      className={`bg-gradient-to-b from-primary to-primary-800 shadow-md transition-all duration-300 relative ${
+    <motion.div 
+      className={`bg-gradient-to-b from-primary to-primary-800 shadow-md transition-all duration-300 relative h-full ${
         collapsed ? 'w-20' : 'w-64'
       }`}
+      initial={false}
+      animate={{ width: collapsed ? 80 : 256 }}
     >
       <div className="p-4 flex items-center justify-between border-b border-primary-700">
         <div className="flex items-center">
@@ -53,7 +86,7 @@ const Sidebar = () => {
           {navigationItems.map((item) => (
             <li key={item.to}>
               <NavLink
-                to={item.to}
+                to={getContextualUrl(item.to)}
                 className={({ isActive }) =>
                   `flex items-center p-3 rounded-lg transition-all duration-300 ${
                     isActive
@@ -62,21 +95,33 @@ const Sidebar = () => {
                   }`
                 }
               >
-                <div className="flex items-center">
+                <motion.div 
+                  className="flex items-center"
+                  initial={false}
+                  animate={{ justifyContent: collapsed ? 'center' : 'flex-start' }}
+                >
                   <item.icon 
                     size={20} 
                     strokeWidth={2}
                     style={{ color: item.color }}
-                    className={collapsed ? 'mx-auto' : ''}
                   />
-                  {!collapsed && <span className="ml-4">{item.name}</span>}
-                </div>
+                  {!collapsed && (
+                    <motion.span 
+                      className="ml-4"
+                      initial={{ opacity: 1 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      {item.name}
+                    </motion.span>
+                  )}
+                </motion.div>
               </NavLink>
             </li>
           ))}
         </ul>
       </nav>
-    </div>
+    </motion.div>
   );
 };
 

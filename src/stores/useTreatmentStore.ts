@@ -17,6 +17,19 @@ interface Treatment {
   }[];
 }
 
+interface AnimationState {
+  isPlaying: boolean;
+  currentStep: number;
+  speed: number;
+}
+
+interface VisualizationState {
+  mode: '3d' | '2d';
+  zoom: number;
+  rotation: { x: number; y: number; z: number };
+  highlightedTeeth: string[];
+}
+
 interface TreatmentFilters {
   status: string;
   dateRange: string;
@@ -35,11 +48,20 @@ interface TreatmentState {
   treatments: Treatment[];
   filters: TreatmentFilters;
   pagination: TreatmentPagination;
+  animation: AnimationState;
+  visualization: VisualizationState;
   setFilters: (filters: Partial<TreatmentFilters>) => void;
   setPagination: (pagination: Partial<TreatmentPagination>) => void;
   addTreatment: (treatment: Treatment) => void;
   updateTreatment: (id: string, treatment: Partial<Treatment>) => void;
   deleteTreatment: (id: string) => void;
+  setAnimationState: (state: Partial<AnimationState>) => void;
+  setVisualizationState: (state: Partial<VisualizationState>) => void;
+  toggleAnimation: () => void;
+  nextStep: () => void;
+  previousStep: () => void;
+  resetAnimation: () => void;
+  highlightTeeth: (teethIds: string[]) => void;
 }
 
 export const useTreatmentStore = create<TreatmentState>()(
@@ -58,10 +80,21 @@ export const useTreatmentStore = create<TreatmentState>()(
         pageSize: 10,
         total: 0,
       },
+      animation: {
+        isPlaying: false,
+        currentStep: 0,
+        speed: 1,
+      },
+      visualization: {
+        mode: '3d',
+        zoom: 1,
+        rotation: { x: 0, y: 0, z: 0 },
+        highlightedTeeth: [],
+      },
       setFilters: (filters) =>
         set((state) => ({
           filters: { ...state.filters, ...filters },
-          pagination: { ...state.pagination, page: 1 }, // Reset to first page on filter change
+          pagination: { ...state.pagination, page: 1 },
         })),
       setPagination: (pagination) =>
         set((state) => ({
@@ -90,6 +123,40 @@ export const useTreatmentStore = create<TreatmentState>()(
             ...state.pagination,
             total: state.pagination.total - 1,
           },
+        })),
+      setAnimationState: (animationState) =>
+        set((state) => ({
+          animation: { ...state.animation, ...animationState },
+        })),
+      setVisualizationState: (visualizationState) =>
+        set((state) => ({
+          visualization: { ...state.visualization, ...visualizationState },
+        })),
+      toggleAnimation: () =>
+        set((state) => ({
+          animation: { ...state.animation, isPlaying: !state.animation.isPlaying },
+        })),
+      nextStep: () =>
+        set((state) => ({
+          animation: {
+            ...state.animation,
+            currentStep: state.animation.currentStep + 1,
+          },
+        })),
+      previousStep: () =>
+        set((state) => ({
+          animation: {
+            ...state.animation,
+            currentStep: Math.max(0, state.animation.currentStep - 1),
+          },
+        })),
+      resetAnimation: () =>
+        set((state) => ({
+          animation: { ...state.animation, currentStep: 0, isPlaying: false },
+        })),
+      highlightTeeth: (teethIds) =>
+        set((state) => ({
+          visualization: { ...state.visualization, highlightedTeeth: teethIds },
         })),
     }),
     {
