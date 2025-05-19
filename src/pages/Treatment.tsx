@@ -1,14 +1,20 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Plus, Calendar, DollarSign, Clock, CheckCircle, AlertCircle, ChevronRight, FileText, Pill } from 'lucide-react';
 import { clinicalData } from '../utils/sampleData';
+import { TreatmentVisualizer } from '../components/treatment/TreatmentVisualizer';
 
 const Treatment = () => {
   const { t } = useLanguage();
-  const [filter, setFilter] = useState('active'); // active, completed, upcoming
+  const location = useLocation();
+  const [filter, setFilter] = useState('active');
+  const [selectedProcedure, setSelectedProcedure] = useState<string | null>(null);
+
+  const { diagnosticData, patientId, recommendations } = location.state || {};
 
   // Get treatment data from the sample data
   const treatments = clinicalData.treatments;
@@ -29,6 +35,10 @@ const Treatment = () => {
       urgency: rec.urgency
     }))
   }));
+
+  const handleProcedureClick = (procedureName: string) => {
+    setSelectedProcedure(selectedProcedure === procedureName ? null : procedureName);
+  };
 
   return (
     <div className="space-y-6">
@@ -147,33 +157,47 @@ const Treatment = () => {
 
                 <div className="space-y-3">
                   {treatment.procedures.map((procedure, index) => (
-                    <div key={index} className="p-3 border rounded-lg">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-medium text-gray-800">{procedure.name}</h4>
-                          <div className="flex items-center mt-1">
-                            <Badge
-                              variant={
-                                procedure.urgency === 'High' ? 'danger' :
-                                procedure.urgency === 'Medium' ? 'warning' : 'info'
-                              }
-                              size="sm"
-                              className="mr-2"
-                            >
-                              {procedure.urgency}
-                            </Badge>
-                            <span className="text-sm text-gray-500">
-                              Coverage: {procedure.insuranceCoverage}%
-                            </span>
+                    <div key={index}>
+                      <div 
+                        className="p-3 border rounded-lg cursor-pointer hover:border-[#0073b9] transition-colors"
+                        onClick={() => handleProcedureClick(procedure.name)}
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h4 className="font-medium text-gray-800">{procedure.name}</h4>
+                            <div className="flex items-center mt-1">
+                              <Badge
+                                variant={
+                                  procedure.urgency === 'High' ? 'danger' :
+                                  procedure.urgency === 'Medium' ? 'warning' : 'info'
+                                }
+                                size="sm"
+                                className="mr-2"
+                              >
+                                {procedure.urgency}
+                              </Badge>
+                              <span className="text-sm text-gray-500">
+                                Coverage: {procedure.insuranceCoverage}%
+                              </span>
+                            </div>
                           </div>
+                          <Badge
+                            variant={procedure.status === 'completed' ? 'success' : 'warning'}
+                            size="sm"
+                          >
+                            {procedure.status.charAt(0).toUpperCase() + procedure.status.slice(1)}
+                          </Badge>
                         </div>
-                        <Badge
-                          variant={procedure.status === 'completed' ? 'success' : 'warning'}
-                          size="sm"
-                        >
-                          {procedure.status.charAt(0).toUpperCase() + procedure.status.slice(1)}
-                        </Badge>
                       </div>
+                      
+                      {selectedProcedure === procedure.name && (
+                        <div className="mt-3">
+                          <TreatmentVisualizer 
+                            procedure={procedure.name}
+                            className="border rounded-lg"
+                          />
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

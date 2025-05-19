@@ -77,3 +77,16 @@
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-gray-400;
 }
+
+/* Treatment Visualizer Animation */
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  50% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
+  }
+}
