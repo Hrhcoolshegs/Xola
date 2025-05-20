@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { ArrowLeft, ArrowRight, AlertCircle, Trash2, Loader, Pill, Clipboard } from 'lucide-react';
+import { ArrowLeft, ArrowRight, AlertCircle, Trash2, Loader, Pill, Clipboard, User, Search, Eye, Edit, Check } from 'lucide-react';
 import { patients, clinicalData } from '../utils/sampleData';
 import { ImageUploader } from '../components/clinical/ImageUploader';
 
@@ -393,7 +393,7 @@ const Clinical = () => {
                               {uploadedFiles.map((file, index) => (
                                 <div key={index} className="border rounded-lg p-1">
                                   <div className="aspect-square flex items-center justify-center bg-gray-50">
-                                    <Image size={20} className="text-gray-400" />
+                                    <Eye size={20} className="text-gray-400" />
                                   </div>
                                 </div>
                               ))}
@@ -550,26 +550,6 @@ const Clinical = () => {
         </div>
       </div>
     </div>
-  );
-};
-
-const Search = (props: any) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.3-4.3" />
-    </svg>
   );
 };
 
