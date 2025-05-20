@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { ArrowLeft, ArrowRight, AlertCircle, Trash2, Loader, Pill, Clipboard, Search, Eye, Edit, Check, User, FileText } from 'lucide-react';
+import { ArrowLeft, ArrowRight, AlertCircle, Trash2, Loader, Pill, Clipboard, Search, Eye, Edit, Check, User, FileText, Plus, X } from 'lucide-react';
 import { patients, clinicalData } from '../utils/sampleData';
 import { ImageUploader } from '../components/clinical/ImageUploader';
 
@@ -24,6 +24,65 @@ const Clinical = () => {
   const [medications, setMedications] = useState<string>('');
   const [allergies, setAllergies] = useState<string>('');
   const [selectedLifestyleFactors, setSelectedLifestyleFactors] = useState<Set<string>>(new Set());
+  const [selectedMedications, setSelectedMedications] = useState<Set<string>>(new Set());
+  const [customMedication, setCustomMedication] = useState('');
+
+  const commonMedications = {
+    'Pain Relievers / Analgesics': [
+      'Acetaminophen (Tylenol)',
+      'Ibuprofen (Advil, Motrin)',
+      'Naproxen (Aleve)',
+      'Codeine',
+      'Hydrocodone (Vicodin)',
+      'Oxycodone'
+    ],
+    'Antibiotics': [
+      'Amoxicillin',
+      'Clindamycin',
+      'Metronidazole',
+      'Penicillin VK',
+      'Azithromycin'
+    ],
+    'Antiseptics and Mouth Rinses': [
+      'Chlorhexidine gluconate',
+      'Hydrogen peroxide'
+    ],
+    'Anti-inflammatory Agents': [
+      'Dexamethasone',
+      'Prednisone'
+    ],
+    'Local Anesthetics': [
+      'Lidocaine',
+      'Articaine',
+      'Mepivacaine',
+      'Bupivacaine'
+    ],
+    'Other Supportive Medications': [
+      'Nystatin',
+      'Fluconazole',
+      'Acyclovir',
+      'Diazepam'
+    ]
+  };
+
+  const handleMedicationToggle = (medication: string) => {
+    const newMedications = new Set(selectedMedications);
+    if (newMedications.has(medication)) {
+      newMedications.delete(medication);
+    } else {
+      newMedications.add(medication);
+    }
+    setSelectedMedications(newMedications);
+  };
+
+  const handleAddCustomMedication = () => {
+    if (customMedication.trim()) {
+      const newMedications = new Set(selectedMedications);
+      newMedications.add(customMedication.trim());
+      setSelectedMedications(newMedications);
+      setCustomMedication('');
+    }
+  };
 
   const handleFileUpload = (files: File[]) => {
     setUploadedFiles(files);
@@ -371,13 +430,73 @@ const Clinical = () => {
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Current Medications
                             </label>
-                            <textarea
-                              value={medications}
-                              onChange={(e) => setMedications(e.target.value)}
-                              placeholder="List all current medications..."
-                              className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
-                              rows={3}
-                            />
+                            
+                            {/* Medications Categories */}
+                            <div className="space-y-4 mb-4">
+                              {Object.entries(commonMedications).map(([category, medications]) => (
+                                <div key={category} className="border rounded-lg p-4">
+                                  <h4 className="font-medium text-gray-700 mb-2">{category}</h4>
+                                  <div className="flex flex-wrap gap-2">
+                                    {medications.map((medication) => (
+                                      <button
+                                        key={medication}
+                                        onClick={() => handleMedicationToggle(medication)}
+                                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                                          selectedMedications.has(medication)
+                                            ? 'bg-[#0073b9] text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        }`}
+                                      >
+                                        {medication}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Custom Medication Input */}
+                            <div className="flex gap-2 mb-4">
+                              <input
+                                type="text"
+                                value={customMedication}
+                                onChange={(e) => setCustomMedication(e.target.value)}
+                                placeholder="Add other medication..."
+                                className="flex-1 border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
+                              />
+                              <Button
+                                variant="outline"
+                                onClick={handleAddCustomMedication}
+                                disabled={!customMedication.trim()}
+                                icon={<Plus size={16} />}
+                              >
+                                Add
+                              </Button>
+                            </div>
+
+                            {/* Selected Medications List */}
+                            {selectedMedications.size > 0 && (
+                              <div className="bg-gray-50 rounded-lg p-4">
+                                <h4 className="font-medium text-gray-700 mb-2">Selected Medications</h4>
+                                <div className="flex flex-wrap gap-2">
+                                  {Array.from(selectedMedications).map((medication) => (
+                                    <div
+                                      key={medication}
+                                      className="bg-white px-3 py-1.5 rounded-full text-sm font-medium border border-gray-200 flex items-center"
+                                    >
+                                      <Pill size={14} className="mr-1.5 text-[#0073b9]" />
+                                      {medication}
+                                      <button
+                                        onClick={() => handleMedicationToggle(medication)}
+                                        className="ml-2 text-gray-400 hover:text-red-500"
+                                      >
+                                        <X size={14} />
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
                           
                           <div>
