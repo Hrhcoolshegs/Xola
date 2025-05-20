@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { ArrowLeft, ArrowRight, AlertCircle, Trash2, Loader, Pill, Clipboard, Search, Eye, Edit, Check, User } from 'lucide-react';
+import { ArrowLeft, ArrowRight, AlertCircle, Trash2, Loader, Pill, Clipboard, Search, Eye, Edit, Check, User, FileText } from 'lucide-react';
 import { patients, clinicalData } from '../utils/sampleData';
 import { ImageUploader } from '../components/clinical/ImageUploader';
 
