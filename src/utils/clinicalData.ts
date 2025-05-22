@@ -1,6 +1,6 @@
 export const dentalSymptoms = [
   'Toothache / Dental pain',
-  'Swollen or bleeding gums',
+  'Swollen or bleeding gums', 
   'Tooth sensitivity (to hot, cold, sweet, or acidic foods)',
   'Bad breath (halitosis)',
   'Dry mouth (xerostomia)',
