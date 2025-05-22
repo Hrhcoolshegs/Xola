@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
-import { Tooth } from 'lucide-react';
+import { Bluetooth as Tooth } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
