@@ -14,8 +14,7 @@ import {
   HelpCircle,
   ChevronLeft,
   ChevronRight,
-  Syringe,
-  Clipboard
+  Tooth
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -29,7 +28,7 @@ const Sidebar = () => {
     { name: t('nav.patients'), to: '/patients', icon: Users, color: '#ff7f50' },
     { name: t('nav.appointments'), to: '/appointments', icon: Calendar, color: '#eab308' },
     { name: t('nav.clinical'), to: '/clinical', icon: Stethoscope, color: '#16a085' },
-    { name: t('nav.treatment'), to: '/treatment', icon: Clipboard, color: '#9370db' },
+    { name: t('nav.treatment'), to: '/treatment', icon: Tooth, color: '#9370db' },
     { name: t('nav.analytics'), to: '/analytics', icon: LineChart, color: '#ffd700' },
     { name: t('nav.medications'), to: '/medications', icon: PillIcon, color: '#dc2626' },
     { name: t('nav.reports'), to: '/reports', icon: FileText, color: '#0284c7' },
@@ -63,8 +62,7 @@ const Sidebar = () => {
       <div className="p-4 flex items-center justify-between border-b border-primary-700">
         <div className="flex items-center">
           <div className="text-accent relative">
-            <Syringe size={32} strokeWidth={2} className="transform -rotate-45" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-accent rounded-full" />
+            <Tooth size={32} strokeWidth={2} className="transform rotate-0" />
           </div>
           {!collapsed && (
             <div className="ml-3">
