@@ -4,7 +4,29 @@ import { useLanguage } from '../context/LanguageContext';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { UserPlus, Search, Filter, Eye, Edit, MoreHorizontal, Brain, ArrowLeft, ArrowRight, AlertTriangle, Clock, RefreshCw, Loader, Pill, Clipboard, Plus, X, Check, User, FileText } from 'lucide-react';
+import {
+  UserPlus,
+  Search,
+  Filter,
+  Eye,
+  Edit,
+  MoreHorizontal,
+  Brain,
+  ArrowLeft,
+  ArrowRight,
+  AlertTriangle,
+  Clock,
+  RefreshCw,
+  Loader,
+  Pill,
+  Clipboard,
+  Plus,
+  X,
+  Check,
+  User,
+  FileText,
+  Image as ImageIcon
+} from 'lucide-react';
 import { patients, clinicalData } from '../utils/sampleData';
 import { ImageUploader } from '../components/clinical/ImageUploader';
 
@@ -32,52 +54,6 @@ const Clinical = () => {
     medications: [{ name: '', dosage: '', frequency: '', duration: '' }],
     notes: ''
   });
-
-  const handleAddProcedure = () => {
-    setManualTreatmentPlan(prev => ({
-      ...prev,
-      procedures: [...prev.procedures, { name: '', cost: 0, urgency: 'Medium', notes: '' }]
-    }));
-  };
-
-  const handleAddMedication = () => {
-    setManualTreatmentPlan(prev => ({
-      ...prev,
-      medications: [...prev.medications, { name: '', dosage: '', frequency: '', duration: '' }]
-    }));
-  };
-
-  const handleProcedureChange = (index: number, field: string, value: string | number) => {
-    setManualTreatmentPlan(prev => ({
-      ...prev,
-      procedures: prev.procedures.map((proc, i) => 
-        i === index ? { ...proc, [field]: value } : proc
-      )
-    }));
-  };
-
-  const handleMedicationChange = (index: number, field: string, value: string) => {
-    setManualTreatmentPlan(prev => ({
-      ...prev,
-      medications: prev.medications.map((med, i) => 
-        i === index ? { ...med, [field]: value } : med
-      )
-    }));
-  };
-
-  const handleRemoveProcedure = (index: number) => {
-    setManualTreatmentPlan(prev => ({
-      ...prev,
-      procedures: prev.procedures.filter((_, i) => i !== index)
-    }));
-  };
-
-  const handleRemoveMedication = (index: number) => {
-    setManualTreatmentPlan(prev => ({
-      ...prev,
-      medications: prev.medications.filter((_, i) => i !== index)
-    }));
-  };
 
   const handleFileUpload = (files: File[]) => {
     setUploadedFiles(files);
@@ -123,185 +99,24 @@ const Clinical = () => {
     }
   };
 
-  const renderManualTreatmentForm = () => (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium text-gray-800">Manual Treatment Plan</h3>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setIsManualMode(false)}
-        >
-          View AI Recommendations
-        </Button>
-      </div>
+  const handleCreateManualTreatment = () => {
+    navigate('/treatment/new', {
+      state: {
+        patientId: selectedPatient,
+        isManual: true
+      }
+    });
+  };
 
-      <div className="space-y-6">
-        <div>
-          <div className="flex justify-between items-center mb-4">
-            <h4 className="font-medium text-gray-700">Procedures</h4>
-            <Button
-              variant="outline"
-              size="sm"
-              icon={<Plus size={16} />}
-              onClick={handleAddProcedure}
-            >
-              Add Procedure
-            </Button>
-          </div>
-          
-          {manualTreatmentPlan.procedures.map((procedure, index) => (
-            <div key={index} className="mb-4 p-4 border rounded-lg">
-              <div className="flex justify-between mb-2">
-                <h5 className="font-medium text-gray-700">Procedure {index + 1}</h5>
-                <button
-                  onClick={() => handleRemoveProcedure(index)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Procedure Name
-                  </label>
-                  <input
-                    type="text"
-                    value={procedure.name}
-                    onChange={(e) => handleProcedureChange(index, 'name', e.target.value)}
-                    className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Cost
-                  </label>
-                  <input
-                    type="number"
-                    value={procedure.cost}
-                    onChange={(e) => handleProcedureChange(index, 'cost', Number(e.target.value))}
-                    className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Urgency
-                  </label>
-                  <select
-                    value={procedure.urgency}
-                    onChange={(e) => handleProcedureChange(index, 'urgency', e.target.value)}
-                    className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
-                  >
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Notes
-                  </label>
-                  <textarea
-                    value={procedure.notes}
-                    onChange={(e) => handleProcedureChange(index, 'notes', e.target.value)}
-                    className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
-                    rows={2}
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div>
-          <div className="flex justify-between items-center mb-4">
-            <h4 className="font-medium text-gray-700">Medications</h4>
-            <Button
-              variant="outline"
-              size="sm"
-              icon={<Plus size={16} />}
-              onClick={handleAddMedication}
-            >
-              Add Medication
-            </Button>
-          </div>
-          
-          {manualTreatmentPlan.medications.map((medication, index) => (
-            <div key={index} className="mb-4 p-4 border rounded-lg">
-              <div className="flex justify-between mb-2">
-                <h5 className="font-medium text-gray-700">Medication {index + 1}</h5>
-                <button
-                  onClick={() => handleRemoveMedication(index)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Medication Name
-                  </label>
-                  <input
-                    type="text"
-                    value={medication.name}
-                    onChange={(e) => handleMedicationChange(index, 'name', e.target.value)}
-                    className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Dosage
-                  </label>
-                  <input
-                    type="text"
-                    value={medication.dosage}
-                    onChange={(e) => handleMedicationChange(index, 'dosage', e.target.value)}
-                    className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Frequency
-                  </label>
-                  <input
-                    type="text"
-                    value={medication.frequency}
-                    onChange={(e) => handleMedicationChange(index, 'frequency', e.target.value)}
-                    className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Duration
-                  </label>
-                  <input
-                    type="text"
-                    value={medication.duration}
-                    onChange={(e) => handleMedicationChange(index, 'duration', e.target.value)}
-                    className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Additional Notes
-          </label>
-          <textarea
-            value={manualTreatmentPlan.notes}
-            onChange={(e) => setManualTreatmentPlan(prev => ({ ...prev, notes: e.target.value }))}
-            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
-            rows={4}
-          />
-        </div>
-      </div>
-    </div>
-  );
+  const handleProceedToTreatment = () => {
+    navigate('/treatment/new', {
+      state: {
+        diagnosticData: analysisResults,
+        patientId: selectedPatient,
+        recommendations: analysisResults.recommendations
+      }
+    });
+  };
 
   const renderResults = () => {
     if (isProcessing) {
@@ -338,193 +153,157 @@ const Clinical = () => {
     }
 
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1">
-          <Card>
-            <div className="space-y-6">
-              <div className="flex items-center">
-                <div className="mr-4">
-                  <div className="h-16 w-16 rounded-full bg-[#0073b9] flex items-center justify-center text-white">
-                    <User size={32} />
-                  </div>
+      <div className="space-y-6">
+        {/* Uploaded Images Display */}
+        <Card title="Uploaded Images">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {uploadedFiles.map((file, index) => (
+              <div key={index} className="relative group">
+                <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden border">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={`Uploaded image ${index + 1}`}
+                    className="w-full h-full object-contain"
+                    onLoad={(e) => {
+                      // Clean up object URL after image loads
+                      const target = e.target as HTMLImageElement;
+                      URL.revokeObjectURL(target.src);
+                    }}
+                  />
                 </div>
-                <div>
-                  <h3 className="font-medium text-gray-800">
-                    {patients.find(p => p.id === selectedPatient)?.name}
-                  </h3>
-                  <p className="text-sm text-gray-500">ID: {selectedPatient}</p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Analysis Date: {new Date().toLocaleDateString()}
-                  </p>
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity flex items-center justify-center rounded-lg">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    icon={<Eye size={16} />}
+                  >
+                    View
+                  </Button>
+                </div>
+                <p className="mt-2 text-sm text-gray-600 truncate">{file.name}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Radiograph Diagnosis Result */}
+        <Card>
+          <div className="space-y-6">
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center space-x-2">
+                  <Brain size={24} className="text-[#0073b9]" />
+                  <h3 className="text-lg font-medium text-gray-800">Radiograph Diagnosis Result</h3>
                 </div>
               </div>
-              
-              <div className="border-t pt-4">
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Uploaded Images</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {uploadedFiles.map((file, index) => (
-                    <div key={index} className="relative group border rounded-lg overflow-hidden">
-                      <div className="aspect-square bg-gray-50 flex items-center justify-center">
-                        <Eye size={20} className="text-gray-400" />
+              <div className="space-y-4">
+                {analysisResults.findings.map((finding: any, index: number) => (
+                  <div key={index} className="p-4 bg-white border rounded-lg hover:border-[#0073b9] transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="font-medium text-gray-800">{finding.condition}</h4>
+                        <p className="text-sm text-gray-500">Location: {finding.location}</p>
                       </div>
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity flex items-center justify-center">
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          View
-                        </Button>
+                      <Badge
+                        variant={
+                          finding.probability > 80 ? 'danger' :
+                          finding.probability > 50 ? 'warning' : 'info'
+                        }
+                      >
+                        {finding.probability}% Probability
+                      </Badge>
+                    </div>
+                    <div className="mt-3">
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className={`h-2 rounded-full transition-all duration-500 ${
+                            finding.probability > 80 ? 'bg-red-500' :
+                            finding.probability > 50 ? 'bg-yellow-500' : 'bg-blue-500'
+                          }`}
+                          style={{ width: `${finding.probability}%` }}
+                        ></div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="flex flex-col gap-2">
-                <Button
-                  variant="outline"
-                  fullWidth
-                  icon={<FileText size={16} />}
-                  onClick={() => navigate('/report', { 
-                    state: { 
-                      diagnosticData: analysisResults,
-                      patientData: patients.find(p => p.id === selectedPatient),
-                      uploadedImages: uploadedFiles
-                    }
-                  })}
-                >
-                  Generate Report
-                </Button>
-                <Button
-                  variant="primary"
-                  fullWidth
-                  icon={<Clipboard size={16} />}
-                  onClick={() => navigate('/treatment/new', {
-                    state: {
-                      diagnosticData: isManualMode ? manualTreatmentPlan : analysisResults,
-                      patientId: selectedPatient,
-                      recommendations: isManualMode ? manualTreatmentPlan.procedures : analysisResults.recommendations
-                    }
-                  })}
-                >
-                  Proceed to Treatment
-                </Button>
+                  </div>
+                ))}
               </div>
             </div>
-          </Card>
-        </div>
-        
-        <div className="lg:col-span-2">
-          <Card>
-            {isManualMode ? (
-              renderManualTreatmentForm()
-            ) : (
-              <div className="space-y-6">
-                <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <div className="flex items-center space-x-2">
-                      <Brain size={24} className="text-[#0073b9]" />
-                      <h3 className="text-lg font-medium text-gray-800">Radiograph Diagnosis Result</h3>
+          </div>
+        </Card>
+
+        {/* Treatment Recommendations */}
+        <Card title="Treatment Recommendations">
+          <div className="space-y-6">
+            <div className="space-y-4">
+              {analysisResults.recommendations.map((recommendation: any, index: number) => (
+                <div key={index} className="p-4 bg-white border rounded-lg hover:border-[#0073b9] transition-colors">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="font-medium text-gray-800">{recommendation.treatment}</h4>
+                      <div className="flex items-center mt-2">
+                        <Badge
+                          variant={
+                            recommendation.urgency === 'High' ? 'danger' :
+                            recommendation.urgency === 'Medium' ? 'warning' : 'info'
+                          }
+                          size="sm"
+                          className="mr-2"
+                        >
+                          {recommendation.urgency} Urgency
+                        </Badge>
+                        <span className="text-sm text-gray-500">
+                          Coverage: {recommendation.insuranceCoverage}%
+                        </span>
+                      </div>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setIsManualMode(true)}
-                    >
-                      Create Manual Plan
-                    </Button>
+                    <div className="text-right">
+                      <p className="text-lg font-semibold text-[#0073b9]">
+                        ${recommendation.cost}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Est. out-of-pocket: ${(recommendation.cost * (1 - recommendation.insuranceCoverage / 100)).toFixed(2)}
+                      </p>
+                    </div>
                   </div>
-                  <div className="space-y-4">
-                    {analysisResults.findings.map((finding: any, index: number) => (
-                      <div key={index} className="p-4 bg-white border rounded-lg hover:border-[#0073b9] transition-colors">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="font-medium text-gray-800">{finding.condition}</h4>
-                            <p className="text-sm text-gray-500">Location: {finding.location}</p>
-                          </div>
-                          <Badge
-                            variant={
-                              finding.probability > 80 ? 'danger' :
-                              finding.probability > 50 ? 'warning' : 'info'
-                            }
-                          >
-                            {finding.probability}% Probability
-                          </Badge>
-                        </div>
-                        <div className="mt-3">
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div 
-                              className={`h-2 rounded-full transition-all duration-500 ${
-                                finding.probability > 80 ? 'bg-red-500' :
-                                finding.probability > 50 ? 'bg-yellow-500' : 'bg-blue-500'
-                              }`}
-                              style={{ width: `${finding.probability}%` }}
-                            ></div>
-                          </div>
+                  
+                  {recommendation.medication !== 'None' && (
+                    <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                      <div className="flex items-center">
+                        <Pill size={16} className="text-[#0073b9] mr-2" />
+                        <div>
+                          <h5 className="text-sm font-medium text-gray-700">
+                            Recommended Medication
+                          </h5>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {recommendation.medication}
+                          </p>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  )}
                 </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium text-gray-800 mb-4">Recommended Treatments</h3>
-                  <div className="space-y-4">
-                    {analysisResults.recommendations.map((recommendation: any, index: number) => (
-                      <div key={index} className="p-4 bg-white border rounded-lg hover:border-[#0073b9] transition-colors">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="font-medium text-gray-800">{recommendation.treatment}</h4>
-                            <div className="flex items-center mt-2">
-                              <Badge
-                                variant={
-                                  recommendation.urgency === 'High' ? 'danger' :
-                                  recommendation.urgency === 'Medium' ? 'warning' : 'info'
-                                }
-                                size="sm"
-                                className="mr-2"
-                              >
-                                {recommendation.urgency} Urgency
-                              </Badge>
-                              <span className="text-sm text-gray-500">
-                                Coverage: {recommendation.insuranceCoverage}%
-                              </span>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-lg font-semibold text-[#0073b9]">
-                              ${recommendation.cost}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              Est. out-of-pocket: ${(recommendation.cost * (1 - recommendation.insuranceCoverage / 100)).toFixed(2)}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        {recommendation.medication !== 'None' && (
-                          <div className="mt-3 p-3 bg-blue-50 rounded-lg">
-                            <div className="flex items-center">
-                              <Pill size={16} className="text-[#0073b9] mr-2" />
-                              <div>
-                                <h5 className="text-sm font-medium text-gray-700">
-                                  Recommended Medication
-                                </h5>
-                                <p className="text-sm text-gray-600 mt-1">
-                                  {recommendation.medication}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </Card>
-        </div>
+              ))}
+            </div>
+
+            <div className="flex justify-end space-x-4">
+              <Button
+                variant="outline"
+                icon={<Plus size={16} />}
+                onClick={handleCreateManualTreatment}
+              >
+                Create Treatment Plan
+              </Button>
+              <Button
+                variant="primary"
+                icon={<ArrowRight size={16} />}
+                onClick={handleProceedToTreatment}
+              >
+                Proceed to Treatment
+              </Button>
+            </div>
+          </div>
+        </Card>
       </div>
     );
   };
