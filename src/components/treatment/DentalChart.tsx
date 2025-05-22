@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { Tooth, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react';
+import { Bluetooth as Tooth, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react';
 
 interface ToothData {
   id: string;
