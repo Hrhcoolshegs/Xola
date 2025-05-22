@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
-import { Syringe } from 'lucide-react';
+import { Tooth } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -35,8 +35,7 @@ const Login = () => {
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center">
               <div className="text-accent relative">
-                <Syringe size={48} strokeWidth={2} className="transform -rotate-45" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-accent rounded-full" />
+                <Tooth size={48} strokeWidth={2} />
               </div>
             </div>
             <h1 className="text-2xl font-bold text-gray-800 mt-4">Welcome to Xola</h1>
@@ -105,9 +104,10 @@ const Login = () => {
           </form>
         </div>
 
-        <p className="text-center mt-8 text-sm text-white">
-          © 2025 Xola SmartCare. All rights reserved.
-        </p>
+        <div className="text-center mt-8">
+          <p className="text-sm text-white">© 2025 Xola SmartCare. All rights reserved.</p>
+          <p className="text-sm text-white mt-1">Powered by Optimus AI Labs</p>
+        </div>
       </div>
     </div>
   );
