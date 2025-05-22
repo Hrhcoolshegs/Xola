@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, AlertTriangle, CheckCircle, Clock, User, ChevronRight } from 'lucide-react';
+import { FileText, AlertTriangle, CheckCircle, Clock, User, Notes, ChevronRight } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
@@ -143,7 +143,7 @@ export const TreatmentStepDetails = ({
             <Button
               variant="outline"
               size="sm"
-              icon={<FileText size={16} />}
+              icon={<Notes size={16} />}
               onClick={() => setShowNoteInput(!showNoteInput)}
             >
               Add Note
