@@ -1,11 +1,29 @@
-import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { Plus, Calendar, DollarSign, Clock, CheckCircle, AlertCircle, ChevronRight, FileText, Pill, Search, Filter, Eye, Edit, Trash2, ArrowLeft, ArrowRight } from 'lucide-react';
-import { clinicalData } from '../utils/sampleData';
+import {
+  Plus,
+  Calendar,
+  DollarSign,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  ChevronRight,
+  FileText,
+  Pill,
+  Search,
+  Filter,
+  Eye,
+  Edit,
+  Trash2,
+  ArrowLeft,
+  ArrowRight,
+  User
+} from 'lucide-react';
+import { clinicalData, patients } from '../utils/sampleData';
 import { TreatmentVisualizer } from '../components/treatment/TreatmentVisualizer';
 import { TreatmentTimeline } from '../components/treatment/TreatmentTimeline';
 import { ImageGallery } from '../components/treatment/ImageGallery';
@@ -20,6 +38,7 @@ import { NoteTemplate } from '../components/treatment/NoteTemplate';
 const Treatment = () => {
   const { t } = useLanguage();
   const location = useLocation();
+  const navigate = useNavigate();
   const [view, setView] = useState<'list' | 'detail'>('list');
   const [selectedTreatment, setSelectedTreatment] = useState<any>(null);
   const [selectedProcedure, setSelectedProcedure] = useState<string | null>(null);
@@ -31,58 +50,14 @@ const Treatment = () => {
   const [dateRange, setDateRange] = useState('all');
 
   const { diagnosticData, patientId, recommendations } = location.state || {};
+  const patient = patientId ? patients.find(p => p.id === patientId) : null;
 
-  // Mock timeline data
-  const timelineSteps = [
-    {
-      id: '1',
-      date: '2023-09-15',
-      title: 'Initial Consultation',
-      description: 'Complete examination and treatment planning',
-      status: 'completed' as const,
-      images: {
-        before: 'https://images.pexels.com/photos/3845126/pexels-photo-3845126.jpeg?auto=compress&cs=tinysrgb&w=600',
-        after: 'https://images.pexels.com/photos/3845548/pexels-photo-3845548.jpeg?auto=compress&cs=tinysrgb&w=600'
-      }
-    },
-    {
-      id: '2',
-      date: '2023-09-22',
-      title: 'First Treatment Session',
-      description: 'Deep cleaning and initial procedure',
-      status: 'current' as const,
-      images: {
-        before: 'https://images.pexels.com/photos/3845126/pexels-photo-3845126.jpeg?auto=compress&cs=tinysrgb&w=600'
-      }
-    },
-    {
-      id: '3',
-      date: '2023-10-06',
-      title: 'Follow-up Treatment',
-      description: 'Review progress and continue treatment',
-      status: 'upcoming' as const
+  // If we have diagnostic data, show the patient-specific view
+  useEffect(() => {
+    if (diagnosticData && patientId) {
+      setView('detail');
     }
-  ];
-
-  // Get treatment data from the sample data
-  const treatments = clinicalData.treatments;
-  
-  // Mock active treatments based on sample diagnostics
-  const activeTreatments = clinicalData.diagnostics.map(diagnostic => ({
-    id: diagnostic.id,
-    patientId: diagnostic.patientId,
-    startDate: diagnostic.date,
-    endDate: new Date(new Date(diagnostic.date).setMonth(new Date(diagnostic.date).getMonth() + 1)).toISOString().split('T')[0],
-    status: 'active',
-    progress: Math.floor(Math.random() * 100),
-    procedures: diagnostic.recommendations.map(rec => ({
-      name: rec.treatment,
-      cost: rec.cost,
-      insuranceCoverage: rec.insuranceCoverage,
-      status: Math.random() > 0.5 ? 'completed' : 'pending',
-      urgency: rec.urgency
-    }))
-  }));
+  }, [diagnosticData, patientId]);
 
   const handleProcedureClick = (procedureName: string) => {
     setSelectedProcedure(selectedProcedure === procedureName ? null : procedureName);
@@ -103,16 +78,152 @@ const Treatment = () => {
     setView('detail');
   };
 
-  const filteredTreatments = activeTreatments.filter(treatment => {
-    const matchesSearch = treatment.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filter === 'all' || treatment.status === filter;
-    const matchesDate = dateRange === 'all' || true; // Implement date filtering logic
+  const filteredTreatments = clinicalData.treatments.filter(treatment => {
+    const matchesSearch = treatment.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filter === 'all' || true; // Implement proper filtering
+    const matchesDate = dateRange === 'all' || true; // Implement proper date filtering
     return matchesSearch && matchesFilter && matchesDate;
   });
 
+  const renderPatientSpecificView = () => {
+    if (!diagnosticData || !patientId || !patient) return null;
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="h-16 w-16 bg-[#0073b9] rounded-full flex items-center justify-center text-white">
+              <User size={32} />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800">{patient.name}</h2>
+              <p className="text-gray-500">Patient ID: {patient.id}</p>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            icon={<ArrowLeft size={16} />}
+            onClick={() => navigate('/clinical')}
+          >
+            Back to Clinical
+          </Button>
+        </div>
+
+        <Card title="Recommended Treatments">
+          <div className="space-y-6">
+            {recommendations.map((recommendation: any, index: number) => (
+              <div key={index} className="p-4 border rounded-lg hover:border-[#0073b9] transition-colors">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-800">{recommendation.treatment}</h3>
+                    <div className="flex items-center mt-2">
+                      <Badge
+                        variant={
+                          recommendation.urgency === 'High' ? 'danger' :
+                          recommendation.urgency === 'Medium' ? 'warning' : 'info'
+                        }
+                        size="sm"
+                        className="mr-2"
+                      >
+                        {recommendation.urgency} Urgency
+                      </Badge>
+                      <span className="text-sm text-gray-500">
+                        Insurance Coverage: {recommendation.insuranceCoverage}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-semibold text-[#0073b9]">
+                      ${recommendation.cost}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Est. out-of-pocket: ${(recommendation.cost * (1 - recommendation.insuranceCoverage / 100)).toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+
+                {recommendation.medication !== 'None' && (
+                  <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                    <div className="flex items-center">
+                      <Pill size={16} className="text-[#0073b9] mr-2" />
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700">
+                          Recommended Medication
+                        </h4>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {recommendation.medication}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-4 flex justify-end space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    icon={<Calendar size={16} />}
+                    onClick={() => setShowDatePicker(true)}
+                  >
+                    Schedule
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    icon={<CheckCircle size={16} />}
+                    onClick={() => handleTreatmentSelect(recommendation)}
+                  >
+                    Start Treatment
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <PrognosisCard
+          prognosis={{
+            successRate: 85,
+            factors: {
+              positive: [
+                'Early detection',
+                'Patient compliance',
+                'Good oral hygiene'
+              ],
+              negative: [
+                'Complex case',
+                'Multiple procedures needed'
+              ]
+            },
+            timeline: [
+              {
+                phase: 'Initial Treatment',
+                duration: '2-3 weeks',
+                milestones: [
+                  'Complete deep cleaning',
+                  'Assess healing response',
+                  'Adjust treatment plan if needed'
+                ]
+              }
+            ],
+            recommendations: [
+              {
+                priority: 'high',
+                action: 'Maintain oral hygiene',
+                rationale: 'Critical for treatment success'
+              }
+            ]
+          }}
+        />
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
-      {view === 'list' ? (
+      {diagnosticData && patientId ? (
+        renderPatientSpecificView()
+      ) : (
         <>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div>
@@ -184,17 +295,12 @@ const Treatment = () => {
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <h3 className="text-lg font-medium text-gray-800">
-                            Treatment Plan #{treatment.id}
+                            {treatment.name}
                           </h3>
-                          <p className="text-sm text-gray-500">Patient ID: {treatment.patientId}</p>
+                          <p className="text-sm text-gray-500">{treatment.category}</p>
                         </div>
-                        <Badge
-                          variant={
-                            treatment.status === 'active' ? 'primary' :
-                            treatment.status === 'completed' ? 'success' : 'warning'
-                          }
-                        >
-                          {treatment.status}
+                        <Badge variant="primary">
+                          Active
                         </Badge>
                       </div>
 
@@ -204,43 +310,28 @@ const Treatment = () => {
                             <Calendar size={16} className="mr-1" />
                             <span className="text-sm">Duration</span>
                           </div>
-                          <p className="font-medium">30 Days</p>
+                          <p className="font-medium">{treatment.duration}</p>
                         </div>
                         <div className="p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center text-gray-500 mb-1">
                             <DollarSign size={16} className="mr-1" />
-                            <span className="text-sm">Total Cost</span>
+                            <span className="text-sm">Cost</span>
                           </div>
-                          <p className="font-medium">
-                            ${treatment.procedures.reduce((sum, proc) => sum + proc.cost, 0)}
-                          </p>
+                          <p className="font-medium">${treatment.averageCost}</p>
                         </div>
                         <div className="p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center text-gray-500 mb-1">
                             <Clock size={16} className="mr-1" />
-                            <span className="text-sm">Progress</span>
+                            <span className="text-sm">Recovery</span>
                           </div>
-                          <div className="flex items-center">
-                            <div className="flex-1 h-2 bg-gray-200 rounded-full mr-2">
-                              <div 
-                                className="h-2 bg-[#0073b9] rounded-full"
-                                style={{ width: `${treatment.progress}%` }}
-                              ></div>
-                            </div>
-                            <span className="text-sm font-medium">
-                              {Math.round(treatment.progress)}%
-                            </span>
-                          </div>
+                          <p className="font-medium">{treatment.recoveryTime}</p>
                         </div>
                         <div className="p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center text-gray-500 mb-1">
                             <CheckCircle size={16} className="mr-1" />
-                            <span className="text-sm">Procedures</span>
+                            <span className="text-sm">Coverage</span>
                           </div>
-                          <p className="font-medium">
-                            {treatment.procedures.filter(p => p.status === 'completed').length}/
-                            {treatment.procedures.length}
-                          </p>
+                          <p className="font-medium">{treatment.insuranceCoverage}</p>
                         </div>
                       </div>
 
@@ -277,212 +368,6 @@ const Treatment = () => {
                   </Card>
                 ))}
               </div>
-            </div>
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="flex items-center mb-6">
-            <Button
-              variant="outline"
-              icon={<ArrowLeft size={16} />}
-              onClick={() => setView('list')}
-              className="mr-4"
-            >
-              Back to List
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">
-                Treatment Plan #{selectedTreatment?.id}
-              </h1>
-              <p className="text-gray-500">Patient ID: {selectedTreatment?.patientId}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              <TreatmentTimeline
-                steps={timelineSteps}
-                onImageClick={handleImageClick}
-              />
-
-              <Card>
-                <div className="space-y-6">
-                  <div className="flex justify-between items-start">
-                    <h3 className="text-lg font-medium text-gray-800">Treatment Progress</h3>
-                    <Badge
-                      variant={selectedTreatment?.status === 'active' ? 'primary' : 'success'}
-                    >
-                      {selectedTreatment?.status}
-                    </Badge>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Completion</h4>
-                      <div className="flex items-center">
-                        <div className="flex-1 h-2 bg-gray-200 rounded-full mr-2">
-                          <div
-                            className="h-2 bg-[#0073b9] rounded-full"
-                            style={{ width: `${selectedTreatment?.progress}%` }}
-                          ></div>
-                        </div>
-                        <span className="text-sm font-medium">
-                          {Math.round(selectedTreatment?.progress)}%
-                        </span>
-                      </div>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Time Remaining</h4>
-                      <p className="font-medium">14 days</p>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Next Visit</h4>
-                      <p className="font-medium">Sep 22, 2023</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    {selectedTreatment?.procedures.map((procedure: any, index: number) => (
-                      <div key={index}>
-                        <div
-                          className="p-4 border rounded-lg cursor-pointer hover:border-[#0073b9] transition-colors"
-                          onClick={() => handleProcedureClick(procedure.name)}
-                        >
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h4 className="font-medium text-gray-800">{procedure.name}</h4>
-                              <div className="flex items-center mt-1">
-                                <Badge
-                                  variant={
-                                    procedure.urgency === 'High' ? 'danger' :
-                                    procedure.urgency === 'Medium' ? 'warning' : 'info'
-                                  }
-                                  size="sm"
-                                  className="mr-2"
-                                >
-                                  {procedure.urgency}
-                                </Badge>
-                                <span className="text-sm text-gray-500">
-                                  Coverage: {procedure.insuranceCoverage}%
-                                </span>
-                              </div>
-                            </div>
-                            <Badge
-                              variant={procedure.status === 'completed' ? 'success' : 'warning'}
-                              size="sm"
-                            >
-                              {procedure.status}
-                            </Badge>
-                          </div>
-                        </div>
-
-                        {selectedProcedure === procedure.name && (
-                          <div className="mt-4">
-                            <TreatmentVisualizer
-                              procedure={procedure.name}
-                              className="border rounded-lg"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </Card>
-
-              <BeforeAfterGallery
-                images={[
-                  {
-                    id: '1',
-                    before: 'https://images.pexels.com/photos/3845126/pexels-photo-3845126.jpeg',
-                    after: 'https://images.pexels.com/photos/3845548/pexels-photo-3845548.jpeg',
-                    date: '2023-09-15',
-                    procedure: 'Initial Treatment',
-                    notes: 'Significant improvement in gum health'
-                  }
-                ]}
-              />
-            </div>
-
-            <div className="space-y-6">
-              <PrognosisCard
-                prognosis={{
-                  successRate: 85,
-                  factors: {
-                    positive: [
-                      'Early detection',
-                      'Patient compliance',
-                      'Good oral hygiene'
-                    ],
-                    negative: [
-                      'Complex case',
-                      'Multiple procedures needed'
-                    ]
-                  },
-                  timeline: [
-                    {
-                      phase: 'Initial Treatment',
-                      duration: '2-3 weeks',
-                      milestones: [
-                        'Complete deep cleaning',
-                        'Assess healing response',
-                        'Adjust treatment plan if needed'
-                      ]
-                    }
-                  ],
-                  recommendations: [
-                    {
-                      priority: 'high',
-                      action: 'Maintain oral hygiene',
-                      rationale: 'Critical for treatment success'
-                    }
-                  ]
-                }}
-              />
-
-              <NoteTemplate
-                templates={[
-                  {
-                    id: '1',
-                    title: 'Progress Note',
-                    content: 'Patient showing good progress with treatment...',
-                    type: 'progress',
-                    tags: ['healing', 'follow-up']
-                  }
-                ]}
-                onSelect={() => {}}
-              />
-
-              <Card>
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium text-gray-800">Quick Actions</h3>
-                  <div className="grid grid-cols-1 gap-2">
-                    <Button
-                      variant="outline"
-                      fullWidth
-                      icon={<Calendar size={16} />}
-                      onClick={() => setShowDatePicker(true)}
-                    >
-                      Schedule Next Visit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      fullWidth
-                      icon={<FileText size={16} />}
-                    >
-                      Generate Report
-                    </Button>
-                    <Button
-                      variant="outline"
-                      fullWidth
-                      icon={<Pill size={16} />}
-                    >
-                      Update Medications
-                    </Button>
-                  </div>
-                </div>
-              </Card>
             </div>
           </div>
         </>
