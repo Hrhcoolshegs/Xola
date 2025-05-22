@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { LanguageProvider } from './context/LanguageContext';
 import MainLayout from './components/Layout/MainLayout';
 import Dashboard from './pages/Dashboard';
@@ -12,30 +14,43 @@ import Report from './pages/Report';
 import ComingSoon from './pages/ComingSoon';
 import NotFound from './pages/NotFound';
 
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+    },
+  },
+});
+
 function App() {
   return (
-    <LanguageProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<MainLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="patients" element={<Patients />} />
-            <Route path="patients/:id" element={<PatientDetail />} />
-            <Route path="appointments" element={<Appointments />} />
-            <Route path="clinical" element={<Clinical />} />
-            <Route path="treatment" element={<Treatment />} />
-            <Route path="treatment/new" element={<Treatment />} />
-            <Route path="analytics" element={<Analytics />} />
-            <Route path="report" element={<Report />} />
-            <Route path="medications" element={<ComingSoon title="Medications" />} />
-            <Route path="reports" element={<ComingSoon title="Reports" />} />
-            <Route path="settings" element={<ComingSoon title="Settings" />} />
-            <Route path="support" element={<ComingSoon title="Support" />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </Router>
-    </LanguageProvider>
+    <QueryClientProvider client={queryClient}>
+      <LanguageProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<MainLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="patients" element={<Patients />} />
+              <Route path="patients/:id" element={<PatientDetail />} />
+              <Route path="appointments" element={<Appointments />} />
+              <Route path="clinical" element={<Clinical />} />
+              <Route path="treatment" element={<Treatment />} />
+              <Route path="treatment/new" element={<Treatment />} />
+              <Route path="analytics" element={<Analytics />} />
+              <Route path="report" element={<Report />} />
+              <Route path="medications" element={<ComingSoon title="Medications" />} />
+              <Route path="reports" element={<ComingSoon title="Reports" />} />
+              <Route path="settings" element={<ComingSoon title="Settings" />} />
+              <Route path="support" element={<ComingSoon title="Support" />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </Router>
+      </LanguageProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 }
 
