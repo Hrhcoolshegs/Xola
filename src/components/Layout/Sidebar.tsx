@@ -2,20 +2,7 @@ import { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { motion } from 'framer-motion';
-import {
-  LayoutDashboard,
-  Users,
-  Calendar,
-  Stethoscope,
-  LineChart,
-  PillIcon,
-  FileText,
-  Settings,
-  HelpCircle,
-  ChevronLeft,
-  ChevronRight,
-  Tooth
-} from 'lucide-react';
+import { LayoutDashboard, Users, Calendar, Stethoscope, LineChart, PillIcon, FileText, Settings, HelpCircle, ChevronLeft, ChevronRight, Bluetooth as Tooth } from 'lucide-react';
 
 const Sidebar = () => {
   const { t } = useLanguage();
