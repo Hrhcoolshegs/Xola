@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { ArrowLeft, ArrowRight, AlertCircle, Trash2, Loader, Pill, Clipboard, Search, Eye, Edit, Check, User, FileText, Plus, X } from 'lucide-react';
+import { UserPlus, Search, Filter, Eye, Edit, MoreHorizontal, Brain, ArrowLeft, ArrowRight, AlertTriangle, Clock, RefreshCw, Loader, Pill, Clipboard, Plus, X, Check, User } from 'lucide-react';
 import { patients, clinicalData } from '../utils/sampleData';
 import { ImageUploader } from '../components/clinical/ImageUploader';
 
@@ -213,14 +213,14 @@ const Clinical = () => {
                         ? 'Image Upload & Analysis'
                         : stepNum === 2
                         ? 'Patient Data Collection'
-                        : 'AI Diagnosis Results'}
+                        : 'Radiograph Diagnosis Result'}
                     </p>
                     <p className={`text-sm mt-1 ${step === stepNum ? 'text-blue-100' : 'text-gray-500'}`}>
                       {stepNum === 1
                         ? 'Upload and analyze dental images'
                         : stepNum === 2
                         ? 'Select patient and enter symptoms'
-                        : 'Review AI-powered diagnosis'}
+                        : 'Review radiograph analysis'}
                     </p>
                   </div>
                 </div>
@@ -231,7 +231,7 @@ const Clinical = () => {
             ))}
           </div>
         </div>
-        
+
         <div className="p-6">
           {step === 1 && (
             <div className="max-w-4xl mx-auto">
@@ -595,9 +595,9 @@ const Clinical = () => {
                       <Loader size={32} className="text-[#0073b9] animate-pulse" />
                     </div>
                   </div>
-                  <h2 className="text-xl font-semibold text-gray-800 mt-8 mb-2">AI Analysis in Progress</h2>
+                  <h2 className="text-xl font-semibold text-gray-800 mt-8 mb-2">Analysis in Progress</h2>
                   <p className="text-gray-500 mb-8 text-center max-w-md">
-                    Our AI is analyzing the uploaded images and patient data to generate a comprehensive diagnosis
+                    Our system is analyzing the uploaded images and patient data to generate a comprehensive diagnosis
                   </p>
                   <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div className="h-full bg-[#0073b9] animate-[progress_2s_ease-in-out_infinite]"></div>
@@ -673,8 +673,11 @@ const Clinical = () => {
                     <Card>
                       <div className="space-y-6">
                         <div>
-                          <h3 className="text-lg font-medium text-gray-800 mb-4">AI Diagnosis Results</h3>
-                          <div className="space-y-4">
+                          <div className="flex items-center space-x-2">
+                            <Brain size={24} className="text-[#0073b9]" />
+                            <h3 className="text-lg font-medium text-gray-800">Radiograph Diagnosis Result</h3>
+                          </div>
+                          <div className="space-y-4 mt-4">
                             {analysisResults.findings.map((finding: any, index: number) => (
                               <div key={index} className="p-4 bg-white border rounded-lg hover:border-[#0073b9] transition-colors">
                                 <div className="flex justify-between items-start">
@@ -706,6 +709,7 @@ const Clinical = () => {
                             ))}
                           </div>
                         </div>
+                        
                         
                         <div>
                           <h3 className="text-lg font-medium text-gray-800 mb-4">Recommended Treatments</h3>
