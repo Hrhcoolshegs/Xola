@@ -5,7 +5,7 @@ import { useTreatmentStore } from '../../stores/useTreatmentStore';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { Calendar, DollarSign, Clock, CheckCircle } from 'lucide-react';
+import { Calendar, DollarSign, Clock, CheckCircle, Eye, Edit, Trash2 } from 'lucide-react';
 
 export const TreatmentList = () => {
   const parentRef = useRef<HTMLDivElement>(null);
@@ -20,7 +20,7 @@ export const TreatmentList = () => {
   const rowVirtualizer = useVirtualizer({
     count: data?.treatments?.length ?? 0,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 200, // Estimated row height
+    estimateSize: () => 200,
     overscan: 5,
   });
 
@@ -86,9 +86,9 @@ export const TreatmentList = () => {
                     <div className="p-3 bg-gray-50 rounded-lg">
                       <div className="flex items-center text-gray-500 mb-1">
                         <Calendar size={16} className="mr-1" />
-                        <span className="text-sm">Duration</span>
+                        <span className="text-sm">Start Date</span>
                       </div>
-                      <p className="font-medium">30 Days</p>
+                      <p className="font-medium">{treatment.startDate}</p>
                     </div>
                     <div className="p-3 bg-gray-50 rounded-lg">
                       <div className="flex items-center text-gray-500 mb-1">
@@ -129,11 +129,19 @@ export const TreatmentList = () => {
                   </div>
 
                   <div className="flex justify-end space-x-2">
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" icon={<Eye size={16} />}>
                       View Details
                     </Button>
-                    <Button variant="primary" size="sm">
-                      Update Progress
+                    <Button variant="outline" size="sm" icon={<Edit size={16} />}>
+                      Edit
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      icon={<Trash2 size={16} />}
+                      className="text-red-600 hover:bg-red-50"
+                    >
+                      Delete
                     </Button>
                   </div>
                 </div>
