@@ -4,9 +4,10 @@ import { useLanguage } from '../context/LanguageContext';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { UserPlus, Search, Filter, Eye, Edit, MoreHorizontal, Brain, ArrowLeft, ArrowRight, AlertTriangle, Clock, RefreshCw, Loader, Pill, Clipboard, Plus, X, Check, User } from 'lucide-react';
+import { UserPlus, Search, Filter, Eye, Edit, MoreHorizontal, Brain, ArrowLeft, ArrowRight, AlertTriangle, Clock, RefreshCw, Loader, Pill, Clipboard, Plus, X, Check, User, FileText } from 'lucide-react';
 import { patients, clinicalData } from '../utils/sampleData';
 import { ImageUploader } from '../components/clinical/ImageUploader';
+import { ManualTreatmentForm } from '../components/clinical/ManualTreatmentForm';
 
 const Clinical = () => {
   const { t } = useLanguage();
@@ -26,6 +27,7 @@ const Clinical = () => {
   const [selectedLifestyleFactors, setSelectedLifestyleFactors] = useState<Set<string>>(new Set());
   const [selectedMedications, setSelectedMedications] = useState<Set<string>>(new Set());
   const [customMedication, setCustomMedication] = useState('');
+  const [isManualMode, setIsManualMode] = useState(false);
 
   const commonMedications = {
     'Pain Relievers / Analgesics': [
@@ -107,14 +109,16 @@ const Clinical = () => {
       setStep(2);
     } else if (step === 2 && selectedPatient) {
       setStep(3);
-      setIsProcessing(true);
-      setTimeout(() => {
-        setIsProcessing(false);
-        const randomDiagnostic = clinicalData.diagnostics[
-          Math.floor(Math.random() * clinicalData.diagnostics.length)
-        ];
-        setAnalysisResults(randomDiagnostic);
-      }, 3000);
+      if (!isManualMode) {
+        setIsProcessing(true);
+        setTimeout(() => {
+          setIsProcessing(false);
+          const randomDiagnostic = clinicalData.diagnostics[
+            Math.floor(Math.random() * clinicalData.diagnostics.length)
+          ];
+          setAnalysisResults(randomDiagnostic);
+        }, 3000);
+      }
     }
   };
 
@@ -170,6 +174,19 @@ const Clinical = () => {
     'Tooth Pain', 'Sensitivity', 'Bleeding Gums', 'Swelling',
     'Bad Breath', 'Loose Teeth', 'Jaw Pain', 'Difficulty Chewing'
   ];
+
+  const handleManualTreatmentSubmit = (procedures: any[]) => {
+    setAnalysisResults({
+      findings: [],
+      recommendations: procedures.map(proc => ({
+        treatment: proc.treatment,
+        urgency: proc.urgency,
+        cost: proc.cost,
+        insuranceCoverage: proc.insuranceCoverage,
+        medication: proc.medication || 'None'
+      }))
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -561,14 +578,22 @@ const Clinical = () => {
                         >
                           Back
                         </Button>
-                        <Button 
-                          variant="primary" 
-                          onClick={nextStep}
-                          icon={<ArrowRight size={16} />}
-                          iconPosition="right"
-                        >
-                          Start Analysis
-                        </Button>
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="outline"
+                            onClick={() => setIsManualMode(!isManualMode)}
+                          >
+                            {isManualMode ? 'Use AI Analysis' : 'Create Manual Plan'}
+                          </Button>
+                          <Button 
+                            variant="primary" 
+                            onClick={nextStep}
+                            icon={<ArrowRight size={16} />}
+                            iconPosition="right"
+                          >
+                            {isManualMode ? 'Continue to Manual Plan' : 'Start Analysis'}
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   ) : (
@@ -603,6 +628,8 @@ const Clinical = () => {
                     <div className="h-full bg-[#0073b9] animate-[progress_2s_ease-in-out_infinite]"></div>
                   </div>
                 </div>
+              ) : isManualMode ? (
+                <ManualTreatmentForm onSubmit={handleManualTreatmentSubmit} />
               ) : analysisResults ? (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-1">
@@ -683,6 +710,7 @@ const Clinical = () => {
                                 <div className="flex justify-between items-start">
                                   <div>
                                     <h4 className="font-medium text-gray-800">{finding.condition}</h4>
+                                    
                                     <p className="text-sm text-gray-500 mt-1">Location: {finding.location}</p>
                                   </div>
                                   <Badge
@@ -709,7 +737,6 @@ const Clinical = () => {
                             ))}
                           </div>
                         </div>
-                        
                         
                         <div>
                           <h3 className="text-lg font-medium text-gray-800 mb-4">Recommended Treatments</h3>
@@ -796,7 +823,7 @@ const Clinical = () => {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-24">
-                  <AlertCircle size={64} className="text-red-500 mb-4" />
+                  <AlertTriangle size={64} className="text-red-500 mb-4" />
                   <h2 className="text-xl font-semibold text-gray-800 mb-2">Analysis Error</h2>
                   <p className="text-gray-500 mb-6">There was an error processing the analysis. Please try again.</p>
                   <Button variant="primary" onClick={() => setStep(1)}>
