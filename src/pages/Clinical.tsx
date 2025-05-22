@@ -4,6 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
+import { TagInput } from '../components/ui/TagInput';
 import {
   Plus, Search, Filter, Eye, Edit, MoreHorizontal, Brain,
   ArrowLeft, ArrowRight, AlertTriangle, Clock, RefreshCw,
@@ -29,11 +30,6 @@ const Clinical = () => {
   const [medications, setMedications] = useState<string[]>([]);
   const [allergies, setAllergies] = useState<string[]>([]);
 
-  // Input states
-  const [symptomInput, setSymptomInput] = useState('');
-  const [medicationInput, setMedicationInput] = useState('');
-  const [allergyInput, setAllergyInput] = useState('');
-
   // Custom items states
   const [customSymptoms, setCustomSymptoms] = useState<string[]>([]);
   const [customMedications, setCustomMedications] = useState<string[]>([]);
@@ -44,44 +40,6 @@ const Clinical = () => {
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const handleAddItem = (
-    item: string,
-    items: string[],
-    setItems: (items: string[]) => void,
-    customItems: string[],
-    setCustomItems: (items: string[]) => void,
-    predefinedItems: string[],
-    inputSetter: (value: string) => void
-  ) => {
-    if (!item.trim()) return;
-
-    if (!items.includes(item)) {
-      setItems([...items, item]);
-      
-      // If it's not in predefined items, add to custom items
-      if (!predefinedItems.includes(item) && !customItems.includes(item)) {
-        setCustomItems([...customItems, item]);
-      }
-    }
-    
-    inputSetter('');
-  };
-
-  const handleRemoveItem = (
-    itemToRemove: string,
-    items: string[],
-    setItems: (items: string[]) => void,
-    customItems: string[],
-    setCustomItems: (items: string[]) => void
-  ) => {
-    setItems(items.filter(item => item !== itemToRemove));
-    
-    // If it's a custom item, remove from custom items too
-    if (customItems.includes(itemToRemove)) {
-      setCustomItems(customItems.filter(item => item !== itemToRemove));
-    }
-  };
 
   const handleFileUpload = (files: File[]) => {
     setUploadedFiles(files);
@@ -103,182 +61,32 @@ const Clinical = () => {
 
   const renderSelectionSection = () => (
     <div className="space-y-6">
-      {/* Symptoms Section */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Symptoms
-        </label>
-        <div className="flex gap-2 mb-2">
-          <input
-            type="text"
-            list="symptoms-list"
-            value={symptomInput}
-            onChange={(e) => setSymptomInput(e.target.value)}
-            className="flex-1 border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
-            placeholder="Select or enter symptoms..."
-          />
-          <Button
-            variant="outline"
-            onClick={() => handleAddItem(
-              symptomInput,
-              symptoms,
-              setSymptoms,
-              customSymptoms,
-              setCustomSymptoms,
-              dentalSymptoms,
-              setSymptomInput
-            )}
-          >
-            Add
-          </Button>
-        </div>
-        <datalist id="symptoms-list">
-          {[...dentalSymptoms, ...customSymptoms].map((symptom) => (
-            <option key={symptom} value={symptom} />
-          ))}
-        </datalist>
-        <div className="flex flex-wrap gap-2 mt-2">
-          {symptoms.map((symptom) => (
-            <Badge
-              key={symptom}
-              variant="primary"
-              className="flex items-center gap-1"
-            >
-              {symptom}
-              <button
-                onClick={() => handleRemoveItem(
-                  symptom,
-                  symptoms,
-                  setSymptoms,
-                  customSymptoms,
-                  setCustomSymptoms
-                )}
-                className="ml-1 hover:text-red-500"
-              >
-                <X size={14} />
-              </button>
-            </Badge>
-          ))}
-        </div>
-      </div>
+      <TagInput
+        label="Symptoms"
+        value={symptoms}
+        suggestions={[...dentalSymptoms, ...customSymptoms]}
+        onChange={setSymptoms}
+        onAddCustom={(symptom) => setCustomSymptoms([...customSymptoms, symptom])}
+        placeholder="Type to search symptoms or add new ones..."
+      />
 
-      {/* Medications Section */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Current Medications
-        </label>
-        <div className="flex gap-2 mb-2">
-          <input
-            type="text"
-            list="medications-list"
-            value={medicationInput}
-            onChange={(e) => setMedicationInput(e.target.value)}
-            className="flex-1 border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
-            placeholder="Select or enter medications..."
-          />
-          <Button
-            variant="outline"
-            onClick={() => handleAddItem(
-              medicationInput,
-              medications,
-              setMedications,
-              customMedications,
-              setCustomMedications,
-              flattenedMedications,
-              setMedicationInput
-            )}
-          >
-            Add
-          </Button>
-        </div>
-        <datalist id="medications-list">
-          {[...flattenedMedications, ...customMedications].map((medication) => (
-            <option key={medication} value={medication} />
-          ))}
-        </datalist>
-        <div className="flex flex-wrap gap-2 mt-2">
-          {medications.map((medication) => (
-            <Badge
-              key={medication}
-              variant="primary"
-              className="flex items-center gap-1"
-            >
-              {medication}
-              <button
-                onClick={() => handleRemoveItem(
-                  medication,
-                  medications,
-                  setMedications,
-                  customMedications,
-                  setCustomMedications
-                )}
-                className="ml-1 hover:text-red-500"
-              >
-                <X size={14} />
-              </button>
-            </Badge>
-          ))}
-        </div>
-      </div>
+      <TagInput
+        label="Current Medications"
+        value={medications}
+        suggestions={[...flattenedMedications, ...customMedications]}
+        onChange={setMedications}
+        onAddCustom={(medication) => setCustomMedications([...customMedications, medication])}
+        placeholder="Type to search medications or add new ones..."
+      />
 
-      {/* Allergies Section */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Allergies
-        </label>
-        <div className="flex gap-2 mb-2">
-          <input
-            type="text"
-            list="allergies-list"
-            value={allergyInput}
-            onChange={(e) => setAllergyInput(e.target.value)}
-            className="flex-1 border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
-            placeholder="Select or enter allergies..."
-          />
-          <Button
-            variant="outline"
-            onClick={() => handleAddItem(
-              allergyInput,
-              allergies,
-              setAllergies,
-              customAllergies,
-              setCustomAllergies,
-              dentalAllergies,
-              setAllergyInput
-            )}
-          >
-            Add
-          </Button>
-        </div>
-        <datalist id="allergies-list">
-          {[...dentalAllergies, ...customAllergies].map((allergy) => (
-            <option key={allergy} value={allergy} />
-          ))}
-        </datalist>
-        <div className="flex flex-wrap gap-2 mt-2">
-          {allergies.map((allergy) => (
-            <Badge
-              key={allergy}
-              variant="primary"
-              className="flex items-center gap-1"
-            >
-              {allergy}
-              <button
-                onClick={() => handleRemoveItem(
-                  allergy,
-                  allergies,
-                  setAllergies,
-                  customAllergies,
-                  setCustomAllergies
-                )}
-                className="ml-1 hover:text-red-500"
-              >
-                <X size={14} />
-              </button>
-            </Badge>
-          ))}
-        </div>
-      </div>
+      <TagInput
+        label="Allergies"
+        value={allergies}
+        suggestions={[...dentalAllergies, ...customAllergies]}
+        onChange={setAllergies}
+        onAddCustom={(allergy) => setCustomAllergies([...customAllergies, allergy])}
+        placeholder="Type to search allergies or add new ones..."
+      />
     </div>
   );
 
