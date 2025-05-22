@@ -1,7 +1,10 @@
+import { useRef } from 'react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { FileText, Download, Printer, Share2, Clock, DollarSign, CheckCircle, AlertTriangle } from 'lucide-react';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 interface TreatmentReportProps {
   treatment: {
@@ -28,13 +31,49 @@ interface TreatmentReportProps {
 }
 
 export const TreatmentReport = ({ treatment, onPrint, onDownload, onShare }: TreatmentReportProps) => {
+  const reportRef = useRef<HTMLDivElement>(null);
+
+  const handleDownload = async () => {
+    if (!reportRef.current) return;
+
+    try {
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false
+      });
+
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      pdf.addImage(
+        canvas.toDataURL('image/jpeg', 1.0),
+        'JPEG',
+        0,
+        0,
+        imgWidth,
+        imgHeight
+      );
+
+      pdf.save(`treatment-report-${treatment.id}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  };
+
   const totalCost = treatment.procedures.reduce((sum, proc) => sum + proc.cost, 0);
   const completedProcedures = treatment.procedures.filter(proc => proc.status === 'completed').length;
   const progress = (completedProcedures / treatment.procedures.length) * 100;
 
   return (
     <Card>
-      <div className="space-y-6">
+      <div className="space-y-6" ref={reportRef}>
         <div className="flex justify-between items-start">
           <div>
             <h3 className="text-lg font-medium text-gray-800">Treatment Report</h3>
@@ -53,7 +92,7 @@ export const TreatmentReport = ({ treatment, onPrint, onDownload, onShare }: Tre
               variant="outline"
               size="sm"
               icon={<Download size={16} />}
-              onClick={onDownload}
+              onClick={handleDownload}
             >
               Download
             </Button>
