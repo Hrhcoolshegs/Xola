@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { ImageUploader } from '../components/clinical/ImageUploader';
 import { dentalSymptoms, dentalAllergies, flattenedMedications } from '../utils/clinicalData';
+import { patients } from '../utils/sampleData';
 
 const Clinical = () => {
   const { t } = useLanguage();
@@ -21,6 +22,7 @@ const Clinical = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [analysisResults, setAnalysisResults] = useState<any>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // State for symptoms, medications, and allergies
   const [symptoms, setSymptoms] = useState<string[]>([]);
@@ -36,6 +38,12 @@ const Clinical = () => {
   const [customSymptoms, setCustomSymptoms] = useState<string[]>([]);
   const [customMedications, setCustomMedications] = useState<string[]>([]);
   const [customAllergies, setCustomAllergies] = useState<string[]>([]);
+
+  // Filter patients based on search term
+  const filteredPatients = patients.filter(patient => 
+    patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    patient.id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleAddItem = (
     item: string,
@@ -370,9 +378,48 @@ const Clinical = () => {
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                       <input
                         type="text"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Search patients..."
                         className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
                       />
+                    </div>
+                    
+                    <div className="max-h-[calc(100vh-300px)] overflow-y-auto space-y-2">
+                      {filteredPatients.map(patient => (
+                        <div 
+                          key={patient.id}
+                          onClick={() => setSelectedPatient(patient.id)}
+                          className={`p-4 rounded-lg border cursor-pointer transition-all ${
+                            selectedPatient === patient.id 
+                              ? 'border-[#0073b9] bg-blue-50 shadow-md' 
+                              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="flex items-center">
+                            <div className="mr-3">
+                              <div className="h-12 w-12 rounded-full bg-[#0073b9] flex items-center justify-center text-white">
+                                <User size={24} />
+                              </div>
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-medium text-gray-800">{patient.name}</h4>
+                              <p className="text-sm text-gray-500">ID: {patient.id}</p>
+                              <div className="flex items-center mt-1">
+                                <Badge
+                                  variant={patient.status === 'active' ? 'success' : 'danger'}
+                                  size="sm"
+                                >
+                                  {patient.status}
+                                </Badge>
+                                <span className="text-xs text-gray-500 ml-2">
+                                  Last visit: {patient.lastVisit || 'Never'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </Card>
