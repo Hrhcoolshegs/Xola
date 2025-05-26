@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { Card } from '../components/ui/Card';
@@ -19,7 +19,6 @@ import {
   RefreshCw,
   Loader,
   Pill,
-  Clipboard,
   Plus,
   X,
   Check,
@@ -29,6 +28,55 @@ import {
 } from 'lucide-react';
 import { patients, clinicalData } from '../utils/sampleData';
 import { ImageUploader } from '../components/clinical/ImageUploader';
+
+// Predefined lists
+const commonSymptoms = [
+  'Toothache / Dental pain',
+  'Swollen or bleeding gums',
+  'Tooth sensitivity',
+  'Bad breath',
+  'Dry mouth',
+  'Jaw pain',
+  'Loose teeth',
+  'Mouth sores',
+  'Swelling in face/jaw',
+  'Cracked/chipped teeth',
+  'Discolored teeth',
+  'Gum recession',
+  'Abscess',
+  'Difficulty chewing',
+  'Post-procedure pain'
+];
+
+const commonMedications = [
+  'Amoxicillin',
+  'Clindamycin',
+  'Metronidazole',
+  'Erythromycin',
+  'Azithromycin',
+  'Ibuprofen',
+  'Acetaminophen',
+  'Aspirin',
+  'Naproxen',
+  'Hydrocodone',
+  'Lidocaine',
+  'Articaine',
+  'Mepivacaine',
+  'Chlorhexidine',
+  'Fluoride'
+];
+
+const commonAllergies = [
+  'Penicillin',
+  'Latex',
+  'Local anesthetics',
+  'Aspirin/NSAIDs',
+  'Metals (e.g., nickel)',
+  'Acrylic/Resin materials',
+  'Eugenol',
+  'Iodine',
+  'Sulfa drugs'
+];
 
 const Clinical = () => {
   const { t } = useLanguage();
@@ -40,20 +88,21 @@ const Clinical = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [analysisResults, setAnalysisResults] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // State for symptoms, medications, and allergies
   const [symptoms, setSymptoms] = useState<string[]>([]);
+  const [medications, setMedications] = useState<string[]>([]);
+  const [allergies, setAllergies] = useState<string[]>([]);
+  const [customSymptom, setCustomSymptom] = useState('');
+  const [customMedication, setCustomMedication] = useState('');
+  const [customAllergy, setCustomAllergy] = useState('');
+  const [showCustomSymptom, setShowCustomSymptom] = useState(false);
+  const [showCustomMedication, setShowCustomMedication] = useState(false);
+  const [showCustomAllergy, setShowCustomAllergy] = useState(false);
+
   const [painLevel, setPainLevel] = useState<number>(5);
   const [duration, setDuration] = useState<string>('');
-  const [medications, setMedications] = useState<string>('');
-  const [allergies, setAllergies] = useState<string>('');
   const [selectedLifestyleFactors, setSelectedLifestyleFactors] = useState<Set<string>>(new Set());
-  const [selectedMedications, setSelectedMedications] = useState<Set<string>>(new Set());
-  const [customMedication, setCustomMedication] = useState('');
-  const [isManualMode, setIsManualMode] = useState(false);
-  const [manualTreatmentPlan, setManualTreatmentPlan] = useState({
-    procedures: [{ name: '', cost: 0, urgency: 'Medium', notes: '' }],
-    medications: [{ name: '', dosage: '', frequency: '', duration: '' }],
-    notes: ''
-  });
 
   const handleFileUpload = (files: File[]) => {
     setUploadedFiles(files);
@@ -71,6 +120,54 @@ const Clinical = () => {
         return prev + 10;
       });
     }, 200);
+  };
+
+  const handleAddCustomSymptom = () => {
+    if (customSymptom.trim()) {
+      setSymptoms([...symptoms, customSymptom.trim()]);
+      setCustomSymptom('');
+      setShowCustomSymptom(false);
+    }
+  };
+
+  const handleAddCustomMedication = () => {
+    if (customMedication.trim()) {
+      setMedications([...medications, customMedication.trim()]);
+      setCustomMedication('');
+      setShowCustomMedication(false);
+    }
+  };
+
+  const handleAddCustomAllergy = () => {
+    if (customAllergy.trim()) {
+      setAllergies([...allergies, customAllergy.trim()]);
+      setCustomAllergy('');
+      setShowCustomAllergy(false);
+    }
+  };
+
+  const toggleSymptom = (symptom: string) => {
+    setSymptoms(prev => 
+      prev.includes(symptom)
+        ? prev.filter(s => s !== symptom)
+        : [...prev, symptom]
+    );
+  };
+
+  const toggleMedication = (medication: string) => {
+    setMedications(prev =>
+      prev.includes(medication)
+        ? prev.filter(m => m !== medication)
+        : [...prev, medication]
+    );
+  };
+
+  const toggleAllergy = (allergy: string) => {
+    setAllergies(prev =>
+      prev.includes(allergy)
+        ? prev.filter(a => a !== allergy)
+        : [...prev, allergy]
+    );
   };
 
   const nextStep = () => {
@@ -99,215 +196,6 @@ const Clinical = () => {
     }
   };
 
-  const handleCreateManualTreatment = () => {
-    navigate('/treatment/new', {
-      state: {
-        patientId: selectedPatient,
-        isManual: true
-      }
-    });
-  };
-
-  const handleProceedToTreatment = () => {
-    navigate('/treatment/new', {
-      state: {
-        diagnosticData: analysisResults,
-        patientId: selectedPatient,
-        recommendations: analysisResults.recommendations
-      }
-    });
-  };
-
-  const renderResults = () => {
-    if (isProcessing) {
-      return (
-        <div className="flex flex-col items-center justify-center py-24">
-          <div className="relative">
-            <div className="w-24 h-24 border-4 border-[#0073b9] rounded-full animate-spin border-t-transparent"></div>
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-              <Loader size={32} className="text-[#0073b9] animate-pulse" />
-            </div>
-          </div>
-          <h2 className="text-xl font-semibold text-gray-800 mt-8 mb-2">Analysis in Progress</h2>
-          <p className="text-gray-500 mb-8 text-center max-w-md">
-            Our system is analyzing the uploaded images and patient data to generate a comprehensive diagnosis
-          </p>
-          <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div className="h-full bg-[#0073b9] animate-[progress_2s_ease-in-out_infinite]"></div>
-          </div>
-        </div>
-      );
-    }
-
-    if (!analysisResults) {
-      return (
-        <div className="flex flex-col items-center justify-center py-24">
-          <AlertTriangle size={64} className="text-red-500 mb-4" />
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Analysis Error</h2>
-          <p className="text-gray-500 mb-6">There was an error processing the analysis. Please try again.</p>
-          <Button variant="primary" onClick={() => setStep(1)}>
-            Start Over
-          </Button>
-        </div>
-      );
-    }
-
-    return (
-      <div className="space-y-6">
-        {/* Uploaded Images Display */}
-        <Card title="Uploaded Images">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {uploadedFiles.map((file, index) => (
-              <div key={index} className="relative group">
-                <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden border">
-                  <img
-                    src={URL.createObjectURL(file)}
-                    alt={`Uploaded image ${index + 1}`}
-                    className="w-full h-full object-contain"
-                    onLoad={(e) => {
-                      // Clean up object URL after image loads
-                      const target = e.target as HTMLImageElement;
-                      URL.revokeObjectURL(target.src);
-                    }}
-                  />
-                </div>
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity flex items-center justify-center rounded-lg">
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    icon={<Eye size={16} />}
-                  >
-                    View
-                  </Button>
-                </div>
-                <p className="mt-2 text-sm text-gray-600 truncate">{file.name}</p>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Radiograph Diagnosis Result */}
-        <Card>
-          <div className="space-y-6">
-            <div>
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center space-x-2">
-                  <Brain size={24} className="text-[#0073b9]" />
-                  <h3 className="text-lg font-medium text-gray-800">Radiograph Diagnosis Result</h3>
-                </div>
-              </div>
-              <div className="space-y-4">
-                {analysisResults.findings.map((finding: any, index: number) => (
-                  <div key={index} className="p-4 bg-white border rounded-lg hover:border-[#0073b9] transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-medium text-gray-800">{finding.condition}</h4>
-                        <p className="text-sm text-gray-500">Location: {finding.location}</p>
-                      </div>
-                      <Badge
-                        variant={
-                          finding.probability > 80 ? 'danger' :
-                          finding.probability > 50 ? 'warning' : 'info'
-                        }
-                      >
-                        {finding.probability}% Probability
-                      </Badge>
-                    </div>
-                    <div className="mt-3">
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
-                          className={`h-2 rounded-full transition-all duration-500 ${
-                            finding.probability > 80 ? 'bg-red-500' :
-                            finding.probability > 50 ? 'bg-yellow-500' : 'bg-blue-500'
-                          }`}
-                          style={{ width: `${finding.probability}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Treatment Recommendations */}
-        <Card title="Treatment Recommendations">
-          <div className="space-y-6">
-            <div className="space-y-4">
-              {analysisResults.recommendations.map((recommendation: any, index: number) => (
-                <div key={index} className="p-4 bg-white border rounded-lg hover:border-[#0073b9] transition-colors">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-medium text-gray-800">{recommendation.treatment}</h4>
-                      <div className="flex items-center mt-2">
-                        <Badge
-                          variant={
-                            recommendation.urgency === 'High' ? 'danger' :
-                            recommendation.urgency === 'Medium' ? 'warning' : 'info'
-                          }
-                          size="sm"
-                          className="mr-2"
-                        >
-                          {recommendation.urgency} Urgency
-                        </Badge>
-                        <span className="text-sm text-gray-500">
-                          Coverage: {recommendation.insuranceCoverage}%
-                        </span>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-lg font-semibold text-[#0073b9]">
-                        ${recommendation.cost}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Est. out-of-pocket: ${(recommendation.cost * (1 - recommendation.insuranceCoverage / 100)).toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {recommendation.medication !== 'None' && (
-                    <div className="mt-3 p-3 bg-blue-50 rounded-lg">
-                      <div className="flex items-center">
-                        <Pill size={16} className="text-[#0073b9] mr-2" />
-                        <div>
-                          <h5 className="text-sm font-medium text-gray-700">
-                            Recommended Medication
-                          </h5>
-                          <p className="text-sm text-gray-600 mt-1">
-                            {recommendation.medication}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="flex justify-end space-x-4">
-              <Button
-                variant="outline"
-                icon={<Plus size={16} />}
-                onClick={handleCreateManualTreatment}
-              >
-                Create Treatment Plan
-              </Button>
-              <Button
-                variant="primary"
-                icon={<ArrowRight size={16} />}
-                onClick={handleProceedToTreatment}
-              >
-                Proceed to Treatment
-              </Button>
-            </div>
-          </div>
-        </Card>
-      </div>
-    );
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
@@ -316,7 +204,7 @@ const Clinical = () => {
           <p className="text-gray-500">{t('clinical.diagnostics')}</p>
         </div>
       </div>
-      
+
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="border-b border-gray-200 bg-gray-50">
           <div className="flex flex-col sm:flex-row">
@@ -367,7 +255,7 @@ const Clinical = () => {
             ))}
           </div>
         </div>
-        
+
         <div className="p-6">
           {step === 1 && (
             <div className="max-w-4xl mx-auto">
@@ -380,37 +268,7 @@ const Clinical = () => {
                 onImagesChange={handleFileUpload}
                 initialImages={uploadedFiles}
               />
-              
-              {uploadedFiles.length > 0 && (
-                <div className="mt-8">
-                  <h3 className="text-lg font-medium text-gray-800 mb-4">Reference Images</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {clinicalData.diagnostics[0].images.map((image, index) => (
-                      <div key={index} className="group relative border rounded-lg overflow-hidden">
-                        <img 
-                          src={image.url} 
-                          alt={`Reference ${image.type}`} 
-                          className="w-full h-32 object-cover"
-                        />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity flex items-center justify-center">
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            className="opacity-0 group-hover:opacity-100 transition-opacity"
-                            icon={<Eye size={16} />}
-                          >
-                            View
-                          </Button>
-                        </div>
-                        <div className="p-2 bg-gray-50">
-                          <p className="text-sm font-medium text-gray-700">{image.type}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
+
               <div className="flex justify-end mt-8">
                 <Button 
                   variant="primary" 
@@ -424,7 +282,7 @@ const Clinical = () => {
               </div>
             </div>
           )}
-          
+
           {step === 2 && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-1">
@@ -440,7 +298,7 @@ const Clinical = () => {
                         className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
                       />
                     </div>
-                    
+
                     <div className="max-h-[calc(100vh-300px)] overflow-y-auto space-y-2">
                       {patients.filter(patient => 
                         patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -483,7 +341,7 @@ const Clinical = () => {
                   </div>
                 </Card>
               </div>
-              
+
               <div className="lg:col-span-2">
                 <Card>
                   {selectedPatient ? (
@@ -495,26 +353,11 @@ const Clinical = () => {
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Common Symptoms
                             </label>
-                            <div className="flex flex-wrap gap-2">
-                              {[
-                                'Tooth Pain',
-                                'Sensitivity',
-                                'Bleeding Gums',
-                                'Swelling',
-                                'Bad Breath',
-                                'Loose Teeth',
-                                'Jaw Pain',
-                                'Difficulty Chewing'
-                              ].map((symptom) => (
+                            <div className="flex flex-wrap gap-2 mb-4">
+                              {commonSymptoms.map((symptom) => (
                                 <button
                                   key={symptom}
-                                  onClick={() => {
-                                    if (symptoms.includes(symptom)) {
-                                      setSymptoms(symptoms.filter(s => s !== symptom));
-                                    } else {
-                                      setSymptoms([...symptoms, symptom]);
-                                    }
-                                  }}
+                                  onClick={() => toggleSymptom(symptom)}
                                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                                     symptoms.includes(symptom)
                                       ? 'bg-[#0073b9] text-white'
@@ -525,8 +368,42 @@ const Clinical = () => {
                                 </button>
                               ))}
                             </div>
+                            {showCustomSymptom ? (
+                              <div className="flex gap-2 mt-2">
+                                <input
+                                  type="text"
+                                  value={customSymptom}
+                                  onChange={(e) => setCustomSymptom(e.target.value)}
+                                  placeholder="Enter custom symptom"
+                                  className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
+                                />
+                                <Button
+                                  variant="primary"
+                                  size="sm"
+                                  onClick={handleAddCustomSymptom}
+                                >
+                                  Add
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setShowCustomSymptom(false)}
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                icon={<Plus size={16} />}
+                                onClick={() => setShowCustomSymptom(true)}
+                              >
+                                Add Custom Symptom
+                              </Button>
+                            )}
                           </div>
-                          
+
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Pain Level
@@ -549,7 +426,7 @@ const Clinical = () => {
                               <span>Severe Pain</span>
                             </div>
                           </div>
-                          
+
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Duration
@@ -578,28 +455,112 @@ const Clinical = () => {
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Current Medications
                             </label>
-                            <textarea
-                              value={medications}
-                              onChange={(e) => setMedications(e.target.value)}
-                              placeholder="List current medications..."
-                              className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
-                              rows={2}
-                            />
+                            <div className="flex flex-wrap gap-2 mb-4">
+                              {commonMedications.map((medication) => (
+                                <button
+                                  key={medication}
+                                  onClick={() => toggleMedication(medication)}
+                                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                                    medications.includes(medication)
+                                      ? 'bg-[#0073b9] text-white'
+                                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                  }`}
+                                >
+                                  {medication}
+                                </button>
+                              ))}
+                            </div>
+                            {showCustomMedication ? (
+                              <div className="flex gap-2 mt-2">
+                                <input
+                                  type="text"
+                                  value={customMedication}
+                                  onChange={(e) => setCustomMedication(e.target.value)}
+                                  placeholder="Enter custom medication"
+                                  className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
+                                />
+                                <Button
+                                  variant="primary"
+                                  size="sm"
+                                  onClick={handleAddCustomMedication}
+                                >
+                                  Add
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setShowCustomMedication(false)}
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                icon={<Plus size={16} />}
+                                onClick={() => setShowCustomMedication(true)}
+                              >
+                                Add Custom Medication
+                              </Button>
+                            )}
                           </div>
-                          
+
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Allergies
                             </label>
-                            <textarea
-                              value={allergies}
-                              onChange={(e) => setAllergies(e.target.value)}
-                              placeholder="List any allergies..."
-                              className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
-                              rows={2}
-                            />
+                            <div className="flex flex-wrap gap-2 mb-4">
+                              {commonAllergies.map((allergy) => (
+                                <button
+                                  key={allergy}
+                                  onClick={() => toggleAllergy(allergy)}
+                                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                                    allergies.includes(allergy)
+                                      ? 'bg-[#0073b9] text-white'
+                                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                  }`}
+                                >
+                                  {allergy}
+                                </button>
+                              ))}
+                            </div>
+                            {showCustomAllergy ? (
+                              <div className="flex gap-2 mt-2">
+                                <input
+                                  type="text"
+                                  value={customAllergy}
+                                  onChange={(e) => setCustomAllergy(e.target.value)}
+                                  placeholder="Enter custom allergy"
+                                  className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0073b9] focus:border-transparent"
+                                />
+                                <Button
+                                  variant="primary"
+                                  size="sm"
+                                  onClick={handleAddCustomAllergy}
+                                >
+                                  Add
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setShowCustomAllergy(false)}
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                icon={<Plus size={16} />}
+                                onClick={() => setShowCustomAllergy(true)}
+                              >
+                                Add Custom Allergy
+                              </Button>
+                            )}
                           </div>
-                          
+
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Lifestyle Factors
@@ -680,8 +641,202 @@ const Clinical = () => {
               </div>
             </div>
           )}
-          
-          {step === 3 && renderResults()}
+
+          {step === 3 && (
+            <div className="space-y-6">
+              {isProcessing ? (
+                <div className="flex flex-col items-center justify-center py-24">
+                  <div className="relative">
+                    <div className="w-24 h-24 border-4 border-[#0073b9] rounded-full animate-spin border-t-transparent"></div>
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                      <Loader size={32} className="text-[#0073b9] animate-pulse" />
+                    </div>
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-800 mt-8 mb-2">Analysis in Progress</h2>
+                  <p className="text-gray-500 mb-8 text-center max-w-md">
+                    Our system is analyzing the uploaded images and patient data to generate a comprehensive diagnosis
+                  </p>
+                  <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-[#0073b9] animate-[progress_2s_ease-in-out_infinite]"></div>
+                  </div>
+                </div>
+              ) : !analysisResults ? (
+                <div className="flex flex-col items-center justify-center py-24">
+                  <AlertTriangle size={64} className="text-red-500 mb-4" />
+                  <h2 className="text-xl font-semibold text-gray-800 mb-2">Analysis Error</h2>
+                  <p className="text-gray-500 mb-6">There was an error processing the analysis. Please try again.</p>
+                  <Button variant="primary" onClick={() => setStep(1)}>
+                    Start Over
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  {/* Uploaded Images Display */}
+                  <Card title="Uploaded Images">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {uploadedFiles.map((file, index) => (
+                        <div key={index} className="relative group">
+                          <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden border">
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={`Uploaded image ${index + 1}`}
+                              className="w-full h-full object-contain"
+                              onLoad={(e) => {
+                                // Clean up object URL after image loads
+                                const target = e.target as HTMLImageElement;
+                                URL.revokeObjectURL(target.src);
+                              }}
+                            />
+                          </div>
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity flex items-center justify-center rounded-lg">
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity"
+                              icon={<Eye size={16} />}
+                            >
+                              View
+                            </Button>
+                          </div>
+                          <p className="mt-2 text-sm text-gray-600 truncate">{file.name}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+
+                  {/* Radiograph Diagnosis Result */}
+                  <Card>
+                    <div className="space-y-6">
+                      <div>
+                        <div className="flex justify-between items-center mb-4">
+                          <div className="flex items-center space-x-2">
+                            <Brain size={24} className="text-[#0073b9]" />
+                            <h3 className="text-lg font-medium text-gray-800">Radiograph Diagnosis Result</h3>
+                          </div>
+                        </div>
+                        <div className="space-y-4">
+                          {analysisResults.findings.map((finding: any, index: number) => (
+                            <div key={index} className="p-4 bg-white border rounded-lg hover:border-[#0073b9] transition-colors">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <h4 className="font-medium text-gray-800">{finding.condition}</h4>
+                                  <p className="text-sm text-gray-500">Location: {finding.location}</p>
+                                </div>
+                                <Badge
+                                  variant={
+                                    finding.probability > 80 ? 'danger' :
+                                    finding.probability > 50 ? 'warning' : 'info'
+                                  }
+                                >
+                                  {finding.probability}% Probability
+                                </Badge>
+                              </div>
+                              <div className="mt-3">
+                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                  <div 
+                                    className={`h-2 rounded-full transition-all duration-500 ${
+                                      finding.probability > 80 ? 'bg-red-500' :
+                                      finding.probability > 50 ? 'bg-yellow-500' : 'bg-blue-500'
+                                    }`}
+                                    style={{ width: `${finding.probability}%` }}
+                                  ></div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* Treatment Recommendations */}
+                  <Card title="Treatment Recommendations">
+                    
+                    <div className="space-y-6">
+                      <div className="space-y-4">
+                        {analysisResults.recommendations.map((recommendation: any, index: number) => (
+                          <div key={index} className="p-4 bg-white border rounded-lg hover:border-[#0073b9] transition-colors">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h4 className="font-medium text-gray-800">{recommendation.treatment}</h4>
+                                <div className="flex items-center mt-2">
+                                  <Badge
+                                    variant={
+                                      recommendation.urgency === 'High' ? 'danger' :
+                                      recommendation.urgency === 'Medium' ? 'warning' : 'info'
+                                    }
+                                    size="sm"
+                                    className="mr-2"
+                                  >
+                                    {recommendation.urgency} Urgency
+                                  </Badge>
+                                  <span className="text-sm text-gray-500">
+                                    Coverage: {recommendation.insuranceCoverage}%
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-lg font-semibold text-[#0073b9]">
+                                  ${recommendation.cost}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  Est. out-of-pocket: ${(recommendation.cost * (1 - recommendation.insuranceCoverage / 100)).toFixed(2)}
+                                </p>
+                              </div>
+                            </div>
+
+                            {recommendation.medication !== 'None' && (
+                              <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                                <div className="flex items-center">
+                                  <Pill size={16} className="text-[#0073b9] mr-2" />
+                                  <div>
+                                    <h5 className="text-sm font-medium text-gray-700">
+                                      Recommended Medication
+                                    </h5>
+                                    <p className="text-sm text-gray-600 mt-1">
+                                      {recommendation.medication}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex justify-end space-x-4">
+                        <Button
+                          variant="outline"
+                          icon={<Plus size={16} />}
+                          onClick={() => navigate('/treatment/new', {
+                            state: {
+                              patientId: selectedPatient,
+                              isManual: true
+                            }
+                          })}
+                        >
+                          Create Treatment Plan
+                        </Button>
+                        <Button
+                          variant="primary"
+                          icon={<ArrowRight size={16} />}
+                          onClick={() => navigate('/treatment/new', {
+                            state: {
+                              diagnosticData: analysisResults,
+                              patientId: selectedPatient,
+                              recommendations: analysisResults.recommendations
+                            }
+                          })}
+                        >
+                          Proceed to Treatment
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
