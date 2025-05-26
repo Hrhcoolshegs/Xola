@@ -844,3 +844,5 @@ const Clinical = () => {
 };
 
 export default Clinical;
+
+export default Clinical
