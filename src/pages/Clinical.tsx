@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { patients, clinicalData } from '../utils/sampleData';
 import { ImageUploader } from '../components/clinical/ImageUploader';
+import { ReportDetails } from '../components/clinical/ReportDetails';
 
 // Predefined lists
 const commonSymptoms = [
@@ -96,6 +97,7 @@ const Clinical = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [analysisResults, setAnalysisResults] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showFullReport, setShowFullReport] = useState(false);
   
   // State for symptoms, medications, and allergies
   const [symptoms, setSymptoms] = useState<string[]>([]);
@@ -203,6 +205,17 @@ const Clinical = () => {
       setAnalysisResults(null);
     }
   };
+
+  if (showFullReport && analysisResults) {
+    return (
+      <ReportDetails
+        diagnosticData={analysisResults}
+        patientData={patients.find(p => p.id === selectedPatient)}
+        uploadedImages={uploadedFiles}
+        onBack={() => setShowFullReport(false)}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -478,6 +491,7 @@ const Clinical = () => {
                                       }`}
                                     >
                                       {medication}
+                
                                     </button>
                                   ))}
                                 </div>
@@ -684,34 +698,41 @@ const Clinical = () => {
                 </div>
               ) : (
                 <>
-                  {/* Uploaded Images Display */}
+                  {/* Patient Info */}
+                  <Card>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="h-16 w-16 bg-[#0073b9] rounded-full flex items-center justify-center text-white">
+                          <User size={32} />
+                        </div>
+                        <div className="ml-4">
+                          <h2 className="text-2xl font-bold text-gray-800">
+                            {patients.find(p => p.id === selectedPatient)?.name}
+                          </h2>
+                          <p className="text-gray-500">Patient ID: {selectedPatient}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-500">Analysis Date</p>
+                        <p className="font-medium">{new Date().toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* Uploaded Images */}
                   <Card title="Uploaded Images">
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {uploadedFiles.map((file, index) => (
-                        <div key={index} className="relative group">
-                          <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden border">
-                            <img
-                              src={URL.createObjectURL(file)}
-                              alt={`Uploaded image ${index + 1}`}
-                              className="w-full h-full object-contain"
-                              onLoad={(e) => {
-                                // Clean up object URL after image loads
-                                const target = e.target as HTMLImageElement;
-                                URL.revokeObjectURL(target.src);
-                              }}
-                            />
-                          </div>
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity flex items-center justify-center rounded-lg">
-                            <Button
-                              variant="primary"
-                              size="sm"
-                              className="opacity-0 group-hover:opacity-100 transition-opacity"
-                              icon={<Eye size={16} />}
-                            >
-                              View
-                            </Button>
-                          </div>
-                          <p className="mt-2 text-sm text-gray-600 truncate">{file.name}</p>
+                        <div key={index} className="aspect-square bg-gray-100 rounded-lg overflow-hidden border">
+                          <img
+                            src={URL.createObjectURL(file)}
+                            alt={`Diagnostic image ${index + 1}`}
+                            className="w-full h-full object-cover"
+                            onLoad={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              URL.revokeObjectURL(target.src);
+                            }}
+                          />
                         </div>
                       ))}
                     </div>
@@ -726,6 +747,14 @@ const Clinical = () => {
                             <Brain size={24} className="text-[#0073b9]" />
                             <h3 className="text-lg font-medium text-gray-800">Radiograph Diagnosis Result</h3>
                           </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={prevStep}
+                            icon={<ArrowLeft size={16} />}
+                          >
+                            Back
+                          </Button>
                         </div>
                         <div className="space-y-4">
                           {analysisResults.findings.map((finding: any, index: number) => (
@@ -764,33 +793,32 @@ const Clinical = () => {
 
                   {/* Treatment Recommendations */}
                   <Card title="Treatment Recommendations">
-                    
                     <div className="space-y-6">
                       <div className="space-y-4">
                         {analysisResults.recommendations.map((recommendation: any, index: number) => (
                           <div key={index} className="p-4 bg-white border rounded-lg hover:border-[#0073b9] transition-colors">
                             <div className="flex justify-between items-start">
                               <div>
-                                <h4 className="font-medium text-gray-800">{recommendation.treatment}</h4>
-                                <div className="flex items-center mt-2">
-                                  <Badge
-                                    variant={
-                                      recommendation.urgency === 'High' ? 'danger' :
-                                      recommendation.urgency === 'Medium' ? 'warning' : 'info'
-                                    }
-                                    size="sm"
-                                    className="mr-2"
-                                  >
-                                    {recommendation.urgency} Urgency
-                                  </Badge>
-                                  <span className="text-sm text-gray-500">
-                                    Coverage: {recommendation.insuranceCoverage}%
-                                  </span>
-                                </div>
+                                <h4 className="font-medium text-gray-800">
+                                  {recommendation.treatment}
+                                </h4>
+                                <Badge
+                                  variant={
+                                    recommendation.urgency === 'High' ? 'danger' :
+                                    recommendation.urgency === 'Medium' ? 'warning' : 'info'
+                                  }
+                                  size="sm"
+                                  className="mt-2"
+                                >
+                                  {recommendation.urgency} Urgency
+                                </Badge>
                               </div>
                               <div className="text-right">
                                 <p className="text-lg font-semibold text-[#0073b9]">
                                   ${recommendation.cost}
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                  Insurance: {recommendation.insuranceCoverage}%
                                 </p>
                                 <p className="text-xs text-gray-500">
                                   Est. out-of-pocket: ${(recommendation.cost * (1 - recommendation.insuranceCoverage / 100)).toFixed(2)}
@@ -798,21 +826,20 @@ const Clinical = () => {
                               </div>
                             </div>
 
-                            {recommendation.medication !== 'None' && (
-                              <div className="mt-3 p-3 bg-blue-50 rounded-lg">
-                                <div className="flex items-center">
-                                  <Pill size={16} className="text-[#0073b9] mr-2" />
-                                  <div>
-                                    <h5 className="text-sm font-medium text-gray-700">
-                                      Recommended Medication
-                                    </h5>
-                                    <p className="text-sm text-gray-600 mt-1">
-                                      {recommendation.medication}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
+                            <div className="mt-4 flex justify-end space-x-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                              >
+                                Details
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                              >
+                                Edit
+                              </Button>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -820,15 +847,10 @@ const Clinical = () => {
                       <div className="flex justify-end space-x-4">
                         <Button
                           variant="outline"
-                          icon={<Plus size={16} />}
-                          onClick={() => navigate('/treatment/new', {
-                            state: {
-                              patientId: selectedPatient,
-                              isManual: true
-                            }
-                          })}
+                          icon={<FileText size={16} />}
+                          onClick={() => setShowFullReport(true)}
                         >
-                          Create Treatment Plan
+                          Generate Full Report
                         </Button>
                         <Button
                           variant="primary"
