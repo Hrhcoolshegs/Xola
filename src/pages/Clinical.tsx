@@ -48,23 +48,31 @@ const commonSymptoms = [
   'Post-procedure pain'
 ];
 
-const commonMedications = [
-  'Amoxicillin',
-  'Clindamycin',
-  'Metronidazole',
-  'Erythromycin',
-  'Azithromycin',
-  'Ibuprofen',
-  'Acetaminophen',
-  'Aspirin',
-  'Naproxen',
-  'Hydrocodone',
-  'Lidocaine',
-  'Articaine',
-  'Mepivacaine',
-  'Chlorhexidine',
-  'Fluoride'
-];
+const commonMedications = {
+  'Antibiotics': [
+    'Amoxicillin',
+    'Clindamycin',
+    'Metronidazole',
+    'Erythromycin',
+    'Azithromycin'
+  ],
+  'Pain Relievers': [
+    'Ibuprofen',
+    'Acetaminophen',
+    'Aspirin',
+    'Naproxen',
+    'Hydrocodone'
+  ],
+  'Local Anesthetics': [
+    'Lidocaine',
+    'Articaine',
+    'Mepivacaine'
+  ],
+  'Other': [
+    'Chlorhexidine',
+    'Fluoride'
+  ]
+};
 
 const commonAllergies = [
   'Penicillin',
@@ -455,21 +463,26 @@ const Clinical = () => {
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Current Medications
                             </label>
-                            <div className="flex flex-wrap gap-2 mb-4">
-                              {commonMedications.map((medication) => (
-                                <button
-                                  key={medication}
-                                  onClick={() => toggleMedication(medication)}
-                                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                                    medications.includes(medication)
-                                      ? 'bg-[#0073b9] text-white'
-                                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                  }`}
-                                >
-                                  {medication}
-                                </button>
-                              ))}
-                            </div>
+                            {Object.entries(commonMedications).map(([category, meds]) => (
+                              <div key={category} className="mb-4">
+                                <h4 className="text-sm font-medium text-gray-600 mb-2">{category}</h4>
+                                <div className="flex flex-wrap gap-2">
+                                  {meds.map((medication) => (
+                                    <button
+                                      key={medication}
+                                      onClick={() => toggleMedication(medication)}
+                                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                                        medications.includes(medication)
+                                          ? 'bg-[#0073b9] text-white'
+                                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                      }`}
+                                    >
+                                      {medication}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
                             {showCustomMedication ? (
                               <div className="flex gap-2 mt-2">
                                 <input
