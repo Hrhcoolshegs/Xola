@@ -31,7 +31,7 @@ export const BeforeAfterGallery = ({ images, onImageClick }: BeforeAfterGalleryP
         speed: 500,
         download: false,
         counter: false,
-        plugins: [],
+        selector: '.gallery-item',
       });
 
       return () => {
@@ -61,11 +61,17 @@ export const BeforeAfterGallery = ({ images, onImageClick }: BeforeAfterGalleryP
               <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
                 <div className="grid grid-cols-2 h-full">
                   <div className="relative">
-                    <img
-                      src={image.before}
-                      alt="Before treatment"
-                      className="w-full h-full object-cover"
-                    />
+                    <a 
+                      href={image.before}
+                      className="gallery-item"
+                      data-src={image.before}
+                    >
+                      <img
+                        src={image.before}
+                        alt="Before treatment"
+                        className="w-full h-full object-cover"
+                      />
+                    </a>
                     <Badge
                       variant="primary"
                       className="absolute top-2 left-2"
@@ -75,11 +81,17 @@ export const BeforeAfterGallery = ({ images, onImageClick }: BeforeAfterGalleryP
                   </div>
                   {image.after ? (
                     <div className="relative">
-                      <img
-                        src={image.after}
-                        alt="After treatment"
-                        className="w-full h-full object-cover"
-                      />
+                      <a 
+                        href={image.after}
+                        className="gallery-item"
+                        data-src={image.after}
+                      >
+                        <img
+                          src={image.after}
+                          alt="After treatment"
+                          className="w-full h-full object-cover"
+                        />
+                      </a>
                       <Badge
                         variant="success"
                         className="absolute top-2 right-2"
