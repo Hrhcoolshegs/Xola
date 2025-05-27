@@ -714,3 +714,5 @@ const ReportDetails = ({ diagnosticData, patientData, uploadedImages, onBack }: 
 };
 
 export default ReportDetails;
+
+export { ReportDetails }
