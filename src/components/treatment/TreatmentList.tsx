@@ -1,11 +1,11 @@
-import { useVirtualizer } from '@tanstack/react-virtual';
 import { useRef } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { useTreatments } from '../../services/treatmentService';
 import { useTreatmentStore } from '../../stores/useTreatmentStore';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { Calendar, DollarSign, Clock, CheckCircle, Eye, Edit, Trash2 } from 'lucide-react';
+import { Calendar, DollarSign, Clock, CheckCircle, Eye } from 'lucide-react';
 
 interface TreatmentListProps {
   onTreatmentSelect: (treatment: any) => void;
@@ -132,7 +132,7 @@ export const TreatmentList = ({ onTreatmentSelect }: TreatmentListProps) => {
                     </div>
                   </div>
 
-                  <div className="flex justify-end space-x-2">
+                  <div className="flex justify-end">
                     <Button 
                       variant="outline" 
                       size="sm" 
@@ -140,22 +140,6 @@ export const TreatmentList = ({ onTreatmentSelect }: TreatmentListProps) => {
                       onClick={() => onTreatmentSelect(treatment)}
                     >
                       View Details
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      icon={<Edit size={16} />}
-                      onClick={() => onTreatmentSelect(treatment)}
-                    >
-                      Edit
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      icon={<Trash2 size={16} />}
-                      className="text-red-600 hover:bg-red-50"
-                    >
-                      Delete
                     </Button>
                   </div>
                 </div>
