@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { ArrowLeft, Download, Printer, Share2, User, Calendar, FileText, Pill, AlertTriangle, Image, Brain, Book, FileCheck } from 'lucide-react';
+import { ArrowLeft, Download, Printer, Share2, User, Calendar, FileText, Pill, AlertTriangle, Image as ImageIcon, Brain, Book, FileCheck } from 'lucide-react';
 import { downloadReport } from '../../services/reportService';
 import toast from 'react-hot-toast';
 
@@ -228,6 +228,7 @@ const ReportDetails = ({ diagnosticData, patientData, uploadedImages, onBack }: 
   const [showTreatmentDetails, setShowTreatmentDetails] = useState(false);
   const [showTreatmentEdit, setShowTreatmentEdit] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const navigate = useNavigate();
 
   const handleDownload = async () => {
     setIsDownloading(true);
@@ -243,7 +244,6 @@ const ReportDetails = ({ diagnosticData, patientData, uploadedImages, onBack }: 
   };
 
   const handleTreatmentSave = (updatedTreatment: any) => {
-    // Here you would typically update the treatment in your state/database
     console.log('Updated treatment:', updatedTreatment);
     toast.success('Treatment plan updated successfully');
   };
@@ -430,36 +430,31 @@ const ReportDetails = ({ diagnosticData, patientData, uploadedImages, onBack }: 
                       </Badge>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Severity Assessment</h4>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div 
-                            className={`h-2 rounded-full ${
-                              finding.probability > 80 ? 'bg-red-500' :
-                              finding.probability > 50 ? 'bg-yellow-500' : 'bg-blue-500'
-                            }`}
-                            style={{ width: `${finding.probability}%` }}
-                          ></div>
+                        <p className="text-gray-600 mb-4">{finding.description}</p>
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">Severity Assessment</h4>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className={`h-2 rounded-full ${
+                                finding.probability > 80 ? 'bg-red-500' :
+                                finding.probability > 50 ? 'bg-yellow-500' : 'bg-blue-500'
+                              }`}
+                              style={{ width: `${finding.probability}%` }}
+                            ></div>
+                          </div>
                         </div>
                       </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <h4 className="text-sm font-medium text-gray-700 mb-2">Clinical Observations</h4>
-                          <ul className="list-disc list-inside text-gray-600 space-y-1">
-                            <li>Visible signs of condition present</li>
-                            <li>Consistent with diagnostic criteria</li>
-                            <li>Early intervention recommended</li>
-                          </ul>
-                        </div>
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <h4 className="text-sm font-medium text-gray-700 mb-2">Risk Assessment</h4>
-                          <ul className="list-disc list-inside text-gray-600 space-y-1">
-                            <li>Moderate risk of progression</li>
-                            <li>Good prognosis with treatment</li>
-                            <li>Regular monitoring advised</li>
-                          </ul>
+                      
+                      <div className="relative aspect-video rounded-lg overflow-hidden border">
+                        <img
+                          src={finding.imageUrl}
+                          alt={`${finding.condition} visualization`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm">
+                          {finding.condition} - {finding.location}
                         </div>
                       </div>
                     </div>
@@ -472,10 +467,12 @@ const ReportDetails = ({ diagnosticData, patientData, uploadedImages, onBack }: 
             <Card title="Treatment Recommendations">
               <div className="space-y-4">
                 {diagnosticData.recommendations.map((recommendation: any, index: number) => (
-                  <div key={index} className="p-4 border rounded-lg">
+                  <div key={index} className="p-4 bg-white border rounded-lg hover:border-[#0073b9] transition-colors">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-medium text-gray-800">{recommendation.treatment}</h3>
+                        <h4 className="font-medium text-gray-800">
+                          {recommendation.treatment}
+                        </h4>
                         <Badge
                           variant={
                             recommendation.urgency === 'High' ? 'danger' :
@@ -488,11 +485,11 @@ const ReportDetails = ({ diagnosticData, patientData, uploadedImages, onBack }: 
                         </Badge>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-semibold text-gray-800">
+                        <p className="text-lg font-semibold text-[#0073b9]">
                           ${recommendation.cost}
                         </p>
                         <p className="text-sm text-gray-500">
-                          Insurance Coverage: {recommendation.insuranceCoverage}%
+                          Insurance: {recommendation.insuranceCoverage}%
                         </p>
                         <p className="text-xs text-gray-500">
                           Est. out-of-pocket: ${(recommendation.cost * (1 - recommendation.insuranceCoverage / 100)).toFixed(2)}
@@ -614,7 +611,6 @@ const ReportDetails = ({ diagnosticData, patientData, uploadedImages, onBack }: 
                     <div className="bg-gray-50 p-3 rounded">
                       <p className="font-medium text-gray-700">Journal of Dental Research (2024)</p>
                       <p className="text-gray-600 mt-1">
-                        
                         "Long-term Outcomes of Early Intervention in Dental Caries Management"
                       </p>
                       <p className="text-sm text-gray-500 mt-2">
@@ -715,4 +711,4 @@ const ReportDetails = ({ diagnosticData, patientData, uploadedImages, onBack }: 
 
 export default ReportDetails;
 
-export { ReportDetails }
+export { ReportDetails };
