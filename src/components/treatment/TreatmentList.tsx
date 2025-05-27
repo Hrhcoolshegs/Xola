@@ -7,7 +7,11 @@ import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Calendar, DollarSign, Clock, CheckCircle, Eye, Edit, Trash2 } from 'lucide-react';
 
-export const TreatmentList = () => {
+interface TreatmentListProps {
+  onTreatmentSelect: (treatment: any) => void;
+}
+
+export const TreatmentList = ({ onTreatmentSelect }: TreatmentListProps) => {
   const parentRef = useRef<HTMLDivElement>(null);
   const { filters, pagination, setFilters, setPagination } = useTreatmentStore();
   
@@ -129,10 +133,20 @@ export const TreatmentList = () => {
                   </div>
 
                   <div className="flex justify-end space-x-2">
-                    <Button variant="outline" size="sm" icon={<Eye size={16} />}>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      icon={<Eye size={16} />}
+                      onClick={() => onTreatmentSelect(treatment)}
+                    >
                       View Details
                     </Button>
-                    <Button variant="outline" size="sm" icon={<Edit size={16} />}>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      icon={<Edit size={16} />}
+                      onClick={() => onTreatmentSelect(treatment)}
+                    >
                       Edit
                     </Button>
                     <Button 
