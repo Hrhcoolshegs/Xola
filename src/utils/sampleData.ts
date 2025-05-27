@@ -351,13 +351,31 @@ export const clinicalData = {
       patientId: 'P001',
       date: '2023-03-10',
       findings: [
-        { condition: 'Dental Caries', probability: 86, location: 'Tooth #29' },
-        { condition: 'Mild Gingivitis', probability: 67, location: 'Upper Right Quadrant' },
-        { condition: 'Enamel Erosion', probability: 42, location: 'Multiple Anterior Teeth' }
+        {
+          condition: 'Dental Caries',
+          probability: 86,
+          location: 'Tooth #29',
+          imageUrl: 'https://images.pexels.com/photos/3779711/pexels-photo-3779711.jpeg',
+          description: 'Dental caries, also known as tooth decay, are caused by acids produced by bacteria in dental plaque. The analysis shows areas of demineralization in the enamel.'
+        },
+        {
+          condition: 'Mild Gingivitis',
+          probability: 67,
+          location: 'Upper Right Quadrant',
+          imageUrl: 'https://images.pexels.com/photos/3845548/pexels-photo-3845548.jpeg',
+          description: 'Gingivitis is characterized by inflammation of the gums. The analysis shows redness and swelling of the gingival tissue.'
+        },
+        {
+          condition: 'Enamel Erosion',
+          probability: 42,
+          location: 'Multiple Anterior Teeth',
+          imageUrl: 'https://images.pexels.com/photos/3845126/pexels-photo-3845126.jpeg',
+          description: 'The condition affects the identified area and may require treatment. The AI has identified characteristic patterns associated with this condition.'
+        }
       ],
       images: [
-        { id: 'IMG001', type: 'X-Ray', url: 'https://images.pexels.com/photos/5726837/pexels-photo-5726837.jpeg?auto=compress&cs=tinysrgb&w=600' },
-        { id: 'IMG002', type: 'Intraoral', url: 'https://images.pexels.com/photos/3845126/pexels-photo-3845126.jpeg?auto=compress&cs=tinysrgb&w=600' }
+        { id: 'IMG001', type: 'X-Ray', url: 'https://images.pexels.com/photos/5726837/pexels-photo-5726837.jpeg' },
+        { id: 'IMG002', type: 'Intraoral', url: 'https://images.pexels.com/photos/3845126/pexels-photo-3845126.jpeg' }
       ],
       recommendations: [
         { 
