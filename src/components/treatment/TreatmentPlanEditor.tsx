@@ -154,7 +154,7 @@ export const TreatmentPlanEditor = ({ treatment, onSave, onGenerateReport }: Tre
           <Card>
             <div className="p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
               <div className="flex items-start">
-                <AlertTriangle className="text-blue-500 mt-0.5 mr-2" size={16} />
+                <AlertTriangle className="text-blue-500 mt-0.5 mr-2\" size={16} />
                 <div>
                   <h4 className="text-sm font-medium text-blue-800">Guideline Selected</h4>
                   <p className="text-sm text-blue-700 mt-1">
