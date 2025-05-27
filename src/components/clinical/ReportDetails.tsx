@@ -119,114 +119,10 @@ const TreatmentDetailsModal = ({ treatment, onClose }: TreatmentDetailsModalProp
   );
 };
 
-interface TreatmentEditModalProps {
-  treatment: any;
-  onClose: () => void;
-  onSave: (updatedTreatment: any) => void;
-}
-
-const TreatmentEditModal = ({ treatment, onClose, onSave }: TreatmentEditModalProps) => {
-  const [editedTreatment, setEditedTreatment] = useState(treatment);
-
-  const handleSave = () => {
-    onSave(editedTreatment);
-    onClose();
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-start mb-6">
-          <h2 className="text-xl font-bold text-gray-800">Edit Treatment Plan</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <AlertTriangle size={24} />
-          </button>
-        </div>
-
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Treatment Name
-            </label>
-            <input
-              type="text"
-              value={editedTreatment.treatment}
-              onChange={(e) => setEditedTreatment({ ...editedTreatment, treatment: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073b9]"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Cost ($)
-              </label>
-              <input
-                type="number"
-                value={editedTreatment.cost}
-                onChange={(e) => setEditedTreatment({ ...editedTreatment, cost: Number(e.target.value) })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073b9]"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Insurance Coverage (%)
-              </label>
-              <input
-                type="number"
-                value={editedTreatment.insuranceCoverage}
-                onChange={(e) => setEditedTreatment({ ...editedTreatment, insuranceCoverage: Number(e.target.value) })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073b9]"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Urgency
-            </label>
-            <select
-              value={editedTreatment.urgency}
-              onChange={(e) => setEditedTreatment({ ...editedTreatment, urgency: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073b9]"
-            >
-              <option value="High">High</option>
-              <option value="Medium">Medium</option>
-              <option value="Low">Low</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Notes
-            </label>
-            <textarea
-              value={editedTreatment.notes || ''}
-              onChange={(e) => setEditedTreatment({ ...editedTreatment, notes: e.target.value })}
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073b9]"
-            />
-          </div>
-
-          <div className="flex justify-end space-x-3">
-            <Button variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button variant="primary" onClick={handleSave}>
-              Save Changes
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const ReportDetails = ({ diagnosticData, patientData, uploadedImages, onBack }: any) => {
   const [selectedTab, setSelectedTab] = useState<'findings' | 'guidelines' | 'research'>('findings');
   const [selectedTreatment, setSelectedTreatment] = useState<any>(null);
   const [showTreatmentDetails, setShowTreatmentDetails] = useState(false);
-  const [showTreatmentEdit, setShowTreatmentEdit] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const navigate = useNavigate();
 
@@ -241,11 +137,6 @@ const ReportDetails = ({ diagnosticData, patientData, uploadedImages, onBack }: 
     } finally {
       setIsDownloading(false);
     }
-  };
-
-  const handleTreatmentSave = (updatedTreatment: any) => {
-    console.log('Updated treatment:', updatedTreatment);
-    toast.success('Treatment plan updated successfully');
   };
 
   if (!diagnosticData || !patientData) {
@@ -520,16 +411,6 @@ const ReportDetails = ({ diagnosticData, patientData, uploadedImages, onBack }: 
                       >
                         View Details
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedTreatment(recommendation);
-                          setShowTreatmentEdit(true);
-                        }}
-                      >
-                        Edit
-                      </Button>
                     </div>
                   </div>
                 ))}
@@ -694,14 +575,6 @@ const ReportDetails = ({ diagnosticData, patientData, uploadedImages, onBack }: 
           <TreatmentDetailsModal
             treatment={selectedTreatment}
             onClose={() => setShowTreatmentDetails(false)}
-          />
-        )}
-
-        {showTreatmentEdit && selectedTreatment && (
-          <TreatmentEditModal
-            treatment={selectedTreatment}
-            onClose={() => setShowTreatmentEdit(false)}
-            onSave={handleTreatmentSave}
           />
         )}
       </div>
